@@ -133,7 +133,7 @@ async def fetch_youtube_video(url: str) -> Dict[str, Any]:
     api_url = f"https://{RAPIDAPI_HOST}/youtube/v3/video/details"
     params = {
         "videoId": video_id,
-        "renderableFormats": "360p,480p,720p,1080p,highres",
+        "renderableFormats": "360p,480p,720p,1080p",
         "urlAccess": "proxied",
         "getTranscript": "false"
     }
@@ -142,14 +142,32 @@ async def fetch_youtube_video(url: str) -> Dict[str, Any]:
         response.raise_for_status()
         return response.json()
 
+def extract_instagram_shortcode(url: str) -> Optional[str]:
+    """Extract shortcode from Instagram URL"""
+    patterns = [
+        r'instagram\.com/p/([A-Za-z0-9_-]+)',
+        r'instagram\.com/reel/([A-Za-z0-9_-]+)',
+        r'instagram\.com/tv/([A-Za-z0-9_-]+)',
+        r'instagr\.am/p/([A-Za-z0-9_-]+)'
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+    return None
+
 async def fetch_instagram_video(url: str) -> Dict[str, Any]:
     """Fetch Instagram video/reel/post"""
+    shortcode = extract_instagram_shortcode(url)
+    if not shortcode:
+        raise ValueError("Could not extract Instagram shortcode from URL")
+    
     headers = {
         "x-rapidapi-key": RAPIDAPI_KEY,
         "x-rapidapi-host": RAPIDAPI_HOST
     }
-    api_url = f"https://{RAPIDAPI_HOST}/instagram/v4/post/details"
-    params = {"postUrl": url}
+    api_url = f"https://{RAPIDAPI_HOST}/instagram/v3/media/post/details"
+    params = {"shortcode": shortcode}
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(api_url, headers=headers, params=params)
         response.raise_for_status()
@@ -161,8 +179,8 @@ async def fetch_tiktok_video(url: str) -> Dict[str, Any]:
         "x-rapidapi-key": RAPIDAPI_KEY,
         "x-rapidapi-host": RAPIDAPI_HOST
     }
-    api_url = f"https://{RAPIDAPI_HOST}/tiktok/v2/post/details"
-    params = {"postUrl": url}
+    api_url = f"https://{RAPIDAPI_HOST}/tiktok/v3/post/details"
+    params = {"url": url}
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(api_url, headers=headers, params=params)
         response.raise_for_status()
