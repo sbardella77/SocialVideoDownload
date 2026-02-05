@@ -1,34 +1,123 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Platform-specific colors */
+.platform-youtube {
+    --platform-color: #ff0000;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.platform-instagram {
+    --platform-color: #e1306c;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.platform-tiktok {
+    --platform-color: #00f2ea;
 }
 
-.App-link {
-    color: #61dafb;
+.platform-twitter {
+    --platform-color: #1da1f2;
 }
 
-@keyframes App-logo-spin {
+.platform-facebook {
+    --platform-color: #1877f2;
+}
+
+/* Hero input styling */
+.hero-input {
+    @apply h-14 md:h-16 text-base md:text-lg rounded-full shadow-2xl border-2 border-primary/20 px-6;
+    @apply focus:border-primary focus:ring-4 focus:ring-primary/20;
+    background: hsl(var(--background));
+}
+
+.hero-input:focus {
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.15), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Platform card hover effects */
+.platform-card {
+    @apply relative overflow-hidden;
+}
+
+.platform-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, var(--platform-color, hsl(var(--primary))) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.platform-card:hover::before {
+    opacity: 0.1;
+}
+
+/* Ad placeholder */
+.ad-placeholder {
+    @apply bg-muted/30 border-2 border-dashed border-muted rounded-xl;
+    @apply flex items-center justify-center text-muted-foreground text-sm font-mono uppercase tracking-widest;
+    min-height: 250px;
+}
+
+/* Download result card animation */
+.download-result {
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
     from {
-        transform: rotate(0deg);
+        opacity: 0;
+        transform: translateY(20px);
     }
     to {
-        transform: rotate(360deg);
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* FAQ accordion styling */
+.faq-item {
+    @apply border-b border-border/50;
+}
+
+.faq-item:last-child {
+    @apply border-b-0;
+}
+
+/* Skeleton loading */
+.skeleton-pulse {
+    @apply bg-muted animate-pulse rounded;
+}
+
+/* Button variants */
+.btn-platform {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold;
+    @apply transition-colors duration-200;
+}
+
+.btn-platform:hover {
+    filter: brightness(1.1);
+}
+
+/* Footer styling */
+.footer-link {
+    @apply text-muted-foreground transition-colors duration-200;
+}
+
+.footer-link:hover {
+    @apply text-foreground;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+    .hero-input {
+        @apply h-12 text-sm px-4;
+    }
+    
+    .ad-placeholder {
+        min-height: 200px;
+    }
+}
+
+/* Backdrop blur support check */
+@supports not (backdrop-filter: blur(12px)) {
+    .glass, .glass-dark {
+        background: hsl(var(--background) / 0.95);
     }
 }
