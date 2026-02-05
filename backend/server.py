@@ -357,41 +357,6 @@ def parse_instagram_response(data: Dict[str, Any]) -> DownloadResponse:
                 format='image/jpeg',
                 url=image_url
             ))
-        description=post.get('caption', ''),
-        thumbnail_url=post.get('thumbnail') or post.get('displayUrl'),
-        author=post.get('owner', {}).get('username', 'Unknown'),
-        platform='instagram'
-    )
-    
-    download_options = []
-    video_url = post.get('videoUrl') or post.get('video_url')
-    if video_url:
-        download_options.append(DownloadOption(
-            quality='Original',
-            format='video/mp4',
-            url=video_url
-        ))
-    
-    # Handle carousel posts
-    carousel = post.get('carousel', []) or post.get('sidecar', [])
-    for i, item in enumerate(carousel):
-        item_url = item.get('videoUrl') or item.get('displayUrl')
-        if item_url:
-            download_options.append(DownloadOption(
-                quality=f"Slide {i+1}",
-                format='video/mp4' if item.get('isVideo') else 'image/jpeg',
-                url=item_url
-            ))
-    
-    # If no video, try image
-    if not download_options:
-        image_url = post.get('displayUrl') or post.get('image_url')
-        if image_url:
-            download_options.append(DownloadOption(
-                quality='Original',
-                format='image/jpeg',
-                url=image_url
-            ))
     
     return DownloadResponse(
         success=True,
@@ -402,9 +367,9 @@ def parse_instagram_response(data: Dict[str, Any]) -> DownloadResponse:
     )
 
 def parse_tiktok_response(data: Dict[str, Any]) -> DownloadResponse:
-    """Parse TikTok API response"""
-    video = data.get('video', data)
-    author = data.get('author', {})
+    """Parse TikTok API response - new v3 format"""
+    contents = data.get('contents', [])
+    metadata_info = data.get('metadata', {})
     
     metadata = VideoMetadata(
         title=video.get('desc', video.get('description', 'TikTok Video'))[:100],
