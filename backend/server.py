@@ -304,6 +304,17 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
 
 def parse_instagram_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse Instagram API response - new v3 format"""
+    # Check for API errors first
+    error = data.get('error')
+    if error:
+        error_msg = error.get('message', 'Unknown error') if isinstance(error, dict) else str(error)
+        return DownloadResponse(
+            success=False,
+            message=f"Instagram error: {error_msg}",
+            platform='instagram',
+            error=error_msg
+        )
+    
     contents = data.get('contents', [])
     metadata_info = data.get('metadata', {})
     
