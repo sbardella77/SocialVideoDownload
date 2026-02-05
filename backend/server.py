@@ -256,31 +256,32 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     
     download_options = []
     
-    # Parse from contents array - prioritize renderableVideos (have audio merged)
+    # Parse from contents array
     for content in contents:
-        # First try renderableVideos (these have video+audio merged)
+        # PRIORITY 1: renderableVideos - these have BOTH video AND audio merged
         renderable_videos = content.get('renderableVideos', [])
         for video in renderable_videos:
             render_config = video.get('renderConfig', {})
             execution_url = render_config.get('executionUrl')
-            if execution_url:
-                video_meta = video.get('metadata', {})
+            video_meta = video.get('metadata', {})
+            
+            # Only add if has audio and no error
+            if execution_url and video_meta.get('has_audio') and not video.get('error'):
                 download_options.append(DownloadOption(
-                    quality=f"{video.get('label', 'unknown')} (with audio)",
+                    quality=f"{video.get('label', 'unknown')} (HD with Audio)",
                     format='video/mp4',
                     url=execution_url,
                     size=video_meta.get('content_length_text')
                 ))
         
-        # Then regular videos (may not have audio)
+        # PRIORITY 2: Regular videos (video only - no audio)
         videos = content.get('videos', [])
         for video in videos:
             if video.get('url'):
                 video_meta = video.get('metadata', {})
-                mime_type = video_meta.get('mime_type', '')
-                has_audio = 'mp4a' in mime_type or 'audio' in mime_type.lower()
+                label = video.get('label', video_meta.get('quality_label', 'unknown'))
                 download_options.append(DownloadOption(
-                    quality=f"{video.get('label', video_meta.get('quality_label', 'unknown'))}" + (' (video+audio)' if has_audio else ' (video only)'),
+                    quality=f"{label} (Video Only)",
                     format='video/mp4',
                     url=video.get('url'),
                     size=video_meta.get('content_length_text')
