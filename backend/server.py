@@ -425,31 +425,34 @@ def parse_tiktok_response(data: Dict[str, Any]) -> DownloadResponse:
 
 def parse_twitter_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse Twitter/X API response"""
-    tweet = data.get('tweet', data)
-    user = tweet.get('user', {})
-    media = tweet.get('media', [])
+    # This API might not support Twitter yet - provide graceful fallback
+    contents = data.get('contents', [])
+    metadata_info = data.get('metadata', {})
     
     metadata = VideoMetadata(
-        title=tweet.get('text', 'Twitter Post')[:100],
-        description=tweet.get('text', ''),
-        thumbnail_url=media[0].get('thumbnail') if media else None,
-        author=user.get('name') or user.get('screen_name', 'Unknown'),
-        view_count=tweet.get('view_count'),
+        title=metadata_info.get('text', 'Twitter Post')[:100] if metadata_info.get('text') else 'Twitter Post',
+        description=metadata_info.get('text', ''),
+        thumbnail_url=metadata_info.get('thumbnailUrl'),
+        author=metadata_info.get('author', {}).get('name', 'Unknown') if isinstance(metadata_info.get('author'), dict) else 'Unknown',
         platform='twitter'
     )
     
     download_options = []
-    for m in media:
-        if m.get('type') == 'video' or m.get('video_url'):
-            variants = m.get('variants', [])
-            for v in variants:
-                if v.get('url') and v.get('content_type', '').startswith('video'):
-                    download_options.append(DownloadOption(
-                        quality=f"{v.get('bitrate', 'unknown')}kbps" if v.get('bitrate') else 'Original',
-                        format=v.get('content_type', 'video/mp4'),
-                        url=v.get('url')
-                    ))
-            # Direct video URL
+    for content in contents:
+        videos = content.get('videos', [])
+        for video in videos:
+            if video.get('url'):
+                download_options.append(DownloadOption(
+                    quality=video.get('label', 'Original'),
+                    format='video/mp4',
+                    url=video.get('url')
+                ))
+    
+    # Fallback for old format
+    if not download_options:
+        tweet = data.get('tweet', data)
+        media = tweet.get('media', [])
+        for m in media:
             if m.get('video_url'):
                 download_options.append(DownloadOption(
                     quality='Original',
@@ -466,8 +469,9 @@ def parse_twitter_response(data: Dict[str, Any]) -> DownloadResponse:
     )
 
 def parse_facebook_response(data: Dict[str, Any]) -> DownloadResponse:
-    """Parse Facebook API response"""
-    post = data.get('post', data)
+    """Parse Facebook API response - v3 format"""
+    contents = data.get('contents', [])
+    metadata_info = data.get('metadata', {})
     
     metadata = VideoMetadata(
         title=post.get('title') or post.get('text', 'Facebook Video')[:100],
