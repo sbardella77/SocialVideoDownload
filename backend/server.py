@@ -227,14 +227,21 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     duration_str = additional_data.get('duration', '')
     view_count_str = additional_data.get('view_count', '')
     
-    # Parse duration string like "00:03:33" to seconds
+    # Parse duration 
     duration = None
-    if duration_str:
-        parts = duration_str.split(':')
-        if len(parts) == 3:
-            duration = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-        elif len(parts) == 2:
-            duration = int(parts[0]) * 60 + int(parts[1])
+    duration_val = additional_data.get('duration')
+    if duration_val:
+        if isinstance(duration_val, int):
+            duration = duration_val
+        elif isinstance(duration_val, str):
+            parts = duration_val.split(':')
+            try:
+                if len(parts) == 3:
+                    duration = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+                elif len(parts) == 2:
+                    duration = int(parts[0]) * 60 + int(parts[1])
+            except:
+                pass
     
     # Parse view count
     view_count = None
