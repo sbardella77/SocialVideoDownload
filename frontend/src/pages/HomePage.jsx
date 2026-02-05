@@ -44,9 +44,10 @@ export default function HomePage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-              Download Videos from{" "}
-              <br className="hidden sm:block" />
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2 text-foreground">
+              Download Videos from
+            </p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
               <span className="gradient-text">Any Platform</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
