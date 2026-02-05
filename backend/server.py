@@ -131,9 +131,10 @@ async def fetch_youtube_video(url: str) -> Dict[str, Any]:
         "x-rapidapi-host": RAPIDAPI_HOST
     }
     api_url = f"https://{RAPIDAPI_HOST}/youtube/v3/video/details"
+    # Note: Free plan only supports 1 renderable format
     params = {
         "videoId": video_id,
-        "renderableFormats": "360p,480p,720p,1080p",
+        "renderableFormats": "360p",
         "urlAccess": "proxied",
         "getTranscript": "false"
     }
