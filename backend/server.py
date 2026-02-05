@@ -205,8 +205,8 @@ async def fetch_facebook_video(url: str) -> Dict[str, Any]:
         "x-rapidapi-key": RAPIDAPI_KEY,
         "x-rapidapi-host": RAPIDAPI_HOST
     }
-    api_url = f"https://{RAPIDAPI_HOST}/facebook/v2/post/details"
-    params = {"postUrl": url}
+    api_url = f"https://{RAPIDAPI_HOST}/facebook/v3/post/details"
+    params = {"url": url}
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(api_url, headers=headers, params=params)
         response.raise_for_status()
@@ -216,7 +216,7 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse YouTube API response"""
     # Handle the actual API response format
     contents = data.get('contents', [])
-    video_info = data.get('videoInfo', {})
+    metadata_info = data.get('metadata', {})
     
     # Get video info from contents or direct videoInfo
     title = 'YouTube Video'
