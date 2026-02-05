@@ -58,8 +58,10 @@ export default function TikTokDownloader() {
               </svg>
               TikTok Downloader
             </div>
+            <p className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-foreground">
+              Download TikTok Videos
+            </p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              Download TikTok Videos{" "}
               <span className="text-cyan-400">Without Watermark</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
