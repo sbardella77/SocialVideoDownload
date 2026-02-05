@@ -1,0 +1,174 @@
+{
+  "identity": {
+    "name": "SaveFlex",
+    "tagline": "The Modern Media Downloader",
+    "description": "A lightning-fast, anonymous, and ad-supported media downloader for social platforms.",
+    "archetype": "Swiss & High-Contrast",
+    "emotional_tone": "Efficient, Trustworthy, Modern, Electric"
+  },
+  "typography": {
+    "font_family": {
+      "heading": "Outfit, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "weights": {
+      "heading": "700",
+      "subheading": "600",
+      "body": "400"
+    },
+    "scale": {
+      "h1": "text-5xl md:text-7xl tracking-tight font-bold",
+      "h2": "text-3xl md:text-5xl tracking-tight font-semibold",
+      "h3": "text-xl md:text-2xl font-semibold",
+      "body": "text-base md:text-lg leading-relaxed",
+      "caption": "text-sm text-muted-foreground"
+    }
+  },
+  "colors": {
+    "light": {
+      "background": "#ffffff",
+      "foreground": "#09090b",
+      "primary": "#4f46e5",
+      "primary_foreground": "#ffffff",
+      "secondary": "#f4f4f5",
+      "secondary_foreground": "#18181b",
+      "accent": "#06b6d4",
+      "border": "#e4e4e7",
+      "input": "#f4f4f5",
+      "ring": "#4f46e5"
+    },
+    "dark": {
+      "background": "#09090b",
+      "foreground": "#fafafa",
+      "primary": "#6366f1",
+      "primary_foreground": "#ffffff",
+      "secondary": "#27272a",
+      "secondary_foreground": "#fafafa",
+      "accent": "#22d3ee",
+      "border": "#27272a",
+      "input": "#27272a",
+      "ring": "#6366f1"
+    },
+    "palette": {
+      "brand_indigo": "#4f46e5",
+      "electric_cyan": "#06b6d4",
+      "success_green": "#10b981",
+      "error_red": "#ef4444",
+      "warning_yellow": "#f59e0b"
+    }
+  },
+  "layout_strategy": {
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing": {
+      "section_gap": "py-24 md:py-32",
+      "element_gap": "gap-6 md:gap-8"
+    },
+    "grid": {
+      "bento": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6",
+      "features": "grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+    }
+  },
+  "components": {
+    "HeroInput": {
+      "description": "The core utility. A massive, centered input field with a prominent 'Paste' button.",
+      "style": "h-16 md:h-20 text-lg md:text-xl rounded-full shadow-2xl border-2 border-primary/20 focus:border-primary transition-all",
+      "animation": "hover:scale-[1.01] focus-within:scale-[1.01] transition-transform duration-200"
+    },
+    "PlatformCard": {
+      "description": "Bento grid item representing a supported platform.",
+      "style": "bg-secondary/50 hover:bg-secondary border border-border/50 hover:border-primary/50 rounded-3xl p-6 transition-all duration-300 group cursor-pointer relative overflow-hidden",
+      "elements": [
+        "Icon: Large, 3D or colorful icon",
+        "Title: Bold, bottom aligned",
+        "Badge: 'Supported' or 'New' pill"
+      ]
+    },
+    "AdPlaceholder": {
+      "description": "Designated zones for future AdSense. Must look intentional, not broken.",
+      "style": "bg-muted/30 border-2 border-dashed border-muted rounded-xl flex items-center justify-center text-muted-foreground text-sm font-mono uppercase tracking-widest h-[250px] w-full relative overflow-hidden",
+      "content": "Ad Space"
+    },
+    "FeatureBlock": {
+      "description": "SEO content block explaining features.",
+      "style": "flex flex-col gap-4 p-8 rounded-3xl bg-card border border-border shadow-sm"
+    }
+  },
+  "visual_assets": {
+    "images": [
+      {
+        "category": "hero_background",
+        "url": "https://images.unsplash.com/photo-1694109016554-9a52bff4e9f1?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "Abstract colorful cubes for hero section background (low opacity overlay)"
+      },
+      {
+        "category": "instagram_feature",
+        "url": "https://images.unsplash.com/photo-1643239119967-1afb811745dd?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "3D Glossy Instagram Icon for Instagram page"
+      },
+      {
+        "category": "speed_feature",
+        "url": "https://images.unsplash.com/photo-1646689369746-57157686462b?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "Abstract yellow lines for 'Fast Download' feature"
+      },
+      {
+        "category": "social_abstract",
+        "url": "https://images.unsplash.com/photo-1636516214833-3377b36bdcb5?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "description": "Abstract shapes for general feature sections"
+      }
+    ],
+    "icons": {
+      "library": "lucide-react",
+      "style": "stroke-width-1.5 w-6 h-6"
+    }
+  },
+  "motion": {
+    "library": "framer-motion",
+    "settings": {
+      "initial": { "opacity": 0, "y": 20 },
+      "animate": { "opacity": 1, "y": 0 },
+      "transition": { "duration": 0.4, "ease": "easeOut" }
+    },
+    "hover": {
+      "scale": 1.02,
+      "transition": { "duration": 0.2 }
+    }
+  },
+  "accessibility": {
+    "contrast": "WCAG AA compliant",
+    "focus_states": "Visible ring-2 ring-primary ring-offset-2",
+    "aria_labels": "Required for all icon-only buttons"
+  },
+  "instructions_to_main_agent": [
+    "Use 'Outfit' font for all headings to give a modern, tech feel.",
+    "Implement the 'HeroInput' as the central focus of the homepage. It should feel 'heavy' and substantial.",
+    "Use the 'Bento Grid' layout for the supported platforms section.",
+    "Ensure 'AdPlaceholder' components are placed strategically (sidebar, between sections) but do not block the main user flow.",
+    "Use the provided image URLs for backgrounds and feature highlights. Apply a 'multiply' or 'overlay' blend mode if used as backgrounds.",
+    "Create dedicated pages for each platform (/instagram-downloader, etc.) using the same template but with specific content.",
+    "Ensure the downloader is 'stateless' - no login required.",
+    "Use 'sonner' for toast notifications (e.g., 'Link copied', 'Download started').",
+    "Dark mode should be 'Deep Zinc' (#09090b), not pure black."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use 'sonner' for toasts. Sonner component are located in /app/src/components/ui/sonner.tsx"
+  ]
+}
