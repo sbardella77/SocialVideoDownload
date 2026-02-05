@@ -616,11 +616,11 @@ async def get_platforms():
             "description": "Download TikTok videos without watermark"
         },
         {
-            "id": "twitter",
-            "name": "Twitter / X",
-            "icon": "twitter",
+            "id": "x",
+            "name": "X",
+            "icon": "x",
             "supported_types": ["videos", "gifs"],
-            "description": "Download Twitter/X videos and GIFs"
+            "description": "Download X videos and GIFs"
         },
         {
             "id": "facebook",
