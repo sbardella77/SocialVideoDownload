@@ -7,7 +7,7 @@ const navLinks = [
   { href: "/instagram-downloader", label: "Instagram" },
   { href: "/tiktok-downloader", label: "TikTok" },
   { href: "/youtube-downloader", label: "YouTube" },
-  { href: "/twitter-downloader", label: "Twitter" },
+  { href: "/x-downloader", label: "X" },
   { href: "/facebook-downloader", label: "Facebook" },
 ];
 
