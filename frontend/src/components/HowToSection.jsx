@@ -28,7 +28,8 @@ export const HowToSection = ({ platform = "general" }) => {
     youtube: "YouTube",
     instagram: "Instagram",
     tiktok: "TikTok",
-    twitter: "Twitter/X",
+    x: "X",
+    twitter: "X",
     facebook: "Facebook",
     general: "social media",
   };
