@@ -26,13 +26,13 @@ const platformData = {
     types: ["Videos", "No Watermark"],
     href: "/tiktok-downloader",
   },
-  twitter: {
-    name: "Twitter / X",
-    color: "#1da1f2",
-    bgColor: "bg-blue-500/10",
-    hoverColor: "hover:border-blue-500/50",
+  x: {
+    name: "X",
+    color: "#000000",
+    bgColor: "bg-zinc-500/10",
+    hoverColor: "hover:border-zinc-500/50",
     types: ["Videos", "GIFs"],
-    href: "/twitter-downloader",
+    href: "/x-downloader",
   },
   facebook: {
     name: "Facebook",
