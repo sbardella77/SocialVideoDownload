@@ -124,7 +124,7 @@ export const PlatformGrid = () => {
       <PlatformCard platform="youtube" featured />
       <PlatformCard platform="instagram" featured />
       <PlatformCard platform="tiktok" featured />
-      <PlatformCard platform="twitter" />
+      <PlatformCard platform="x" />
       <PlatformCard platform="facebook" />
     </div>
   );
