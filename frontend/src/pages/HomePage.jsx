@@ -83,7 +83,7 @@ export default function HomePage() {
             <span className="text-foreground font-medium">YouTube</span>
             <span className="text-foreground font-medium">Instagram</span>
             <span className="text-foreground font-medium">TikTok</span>
-            <span className="text-foreground font-medium">Twitter/X</span>
+            <span className="text-foreground font-medium">X</span>
             <span className="text-foreground font-medium">Facebook</span>
           </div>
         </div>
