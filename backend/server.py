@@ -224,8 +224,7 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     author_info = metadata_info.get('author', {})
     author = author_info.get('name', 'Unknown') if isinstance(author_info, dict) else 'Unknown'
     additional_data = metadata_info.get('additionalData', {})
-    duration_str = additional_data.get('duration', '')
-    view_count_str = additional_data.get('view_count', '')
+    view_count_raw = additional_data.get('view_count', '')
     
     # Parse duration 
     duration = None
@@ -245,8 +244,8 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     
     # Parse view count
     view_count = None
-    if view_count_str:
-        view_count_str = view_count_str.replace(',', '').replace(' ', '')
+    if view_count_raw:
+        view_count_str = str(view_count_raw).replace(',', '').replace(' ', '')
         try:
             view_count = int(view_count_str)
         except:
