@@ -23,7 +23,8 @@
 .hero-input {
     @apply h-14 md:h-16 text-base md:text-lg rounded-full shadow-2xl border-2 border-primary/20 px-6;
     @apply focus:border-primary focus:ring-4 focus:ring-primary/20;
-    background: hsl(var(--background));
+    @apply text-foreground placeholder:text-muted-foreground;
+    background: hsl(var(--secondary));
 }
 
 .hero-input:focus {
