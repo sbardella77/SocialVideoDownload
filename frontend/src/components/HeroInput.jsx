@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Clipboard, ArrowRight } from "lucide-react";
+import { Loader2, Clipboard, ArrowRight, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const HeroInput = ({ onSubmit, loading, placeholder }) => {
@@ -15,6 +15,10 @@ export const HeroInput = ({ onSubmit, loading, placeholder }) => {
     } catch (err) {
       toast.error("Unable to access clipboard");
     }
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setUrl("");
   }, []);
 
   const handleSubmit = (e) => {
@@ -36,20 +40,35 @@ export const HeroInput = ({ onSubmit, loading, placeholder }) => {
             onChange={(e) => setUrl(e.target.value)}
             placeholder={placeholder || "Paste your video link here..."}
             disabled={loading}
-            className="hero-input w-full pr-12"
+            className="hero-input w-full pr-20"
             data-testid="url-input"
           />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={handlePaste}
-            disabled={loading}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            data-testid="paste-btn"
-          >
-            <Clipboard className="w-4 h-4" />
-          </Button>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {url && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleClear}
+                disabled={loading}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                data-testid="clear-btn"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handlePaste}
+              disabled={loading}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              data-testid="paste-btn"
+            >
+              <Clipboard className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
         <Button
           type="submit"
