@@ -24,8 +24,14 @@ export default function InstagramDownloader() {
 
     try {
       const response = await axios.post(`${API_URL}/api/download`, { url });
-      setResult(response.data);
-      toast.success("Content found! Choose your download option.");
+      if (response.data.success && response.data.download_options?.length > 0) {
+        setResult(response.data);
+        toast.success("Content found! Choose your download option.");
+      } else {
+        const errorMsg = response.data.error || response.data.message || "No download options available for this content.";
+        toast.error(errorMsg);
+        setResult(null);
+      }
     } catch (error) {
       const message = error.response?.data?.detail || "Failed to process the URL. Please try again.";
       toast.error(message);

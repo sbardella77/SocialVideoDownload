@@ -24,8 +24,14 @@ export default function FacebookDownloader() {
 
     try {
       const response = await axios.post(`${API_URL}/api/download`, { url });
-      setResult(response.data);
-      toast.success("Video found! Choose your download option.");
+      if (response.data.success && response.data.download_options?.length > 0) {
+        setResult(response.data);
+        toast.success("Video found! Choose your download option.");
+      } else {
+        const errorMsg = response.data.error || response.data.message || "No download options available for this video.";
+        toast.error(errorMsg);
+        setResult(null);
+      }
     } catch (error) {
       const message = error.response?.data?.detail || "Failed to process the URL. Please try again.";
       toast.error(message);
