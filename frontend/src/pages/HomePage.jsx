@@ -57,7 +57,7 @@ export default function HomePage() {
               <span className="gradient-text">Any Platform</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              The fastest, free video downloader for YouTube, Instagram, TikTok, Twitter, and Facebook. No signup required.
+              The fastest, free video downloader for YouTube, Instagram, TikTok, X, and Facebook. No signup required.
             </p>
           </div>
 
