@@ -6,7 +6,7 @@ import HomePage from "@/pages/HomePage";
 import InstagramDownloader from "@/pages/InstagramDownloader";
 import TikTokDownloader from "@/pages/TikTokDownloader";
 import YouTubeDownloader from "@/pages/YouTubeDownloader";
-import TwitterDownloader from "@/pages/TwitterDownloader";
+import XDownloader from "@/pages/XDownloader";
 import FacebookDownloader from "@/pages/FacebookDownloader";
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
             <Route path="/instagram-downloader" element={<InstagramDownloader />} />
             <Route path="/tiktok-downloader" element={<TikTokDownloader />} />
             <Route path="/youtube-downloader" element={<YouTubeDownloader />} />
-            <Route path="/twitter-downloader" element={<TwitterDownloader />} />
+            <Route path="/x-downloader" element={<XDownloader />} />
             <Route path="/facebook-downloader" element={<FacebookDownloader />} />
           </Route>
         </Routes>
