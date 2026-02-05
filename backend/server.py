@@ -196,20 +196,57 @@ async def fetch_facebook_video(url: str) -> Dict[str, Any]:
 
 def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse YouTube API response"""
+    # Handle the actual API response format
+    contents = data.get('contents', [])
     video_info = data.get('videoInfo', {})
-    renditions = data.get('renditions', [])
+    
+    # Get video info from contents or direct videoInfo
+    title = 'YouTube Video'
+    author = 'Unknown'
+    thumbnail_url = None
+    duration = None
+    view_count = None
+    
+    if contents:
+        first_content = contents[0] if contents else {}
+        title = first_content.get('title', video_info.get('title', 'YouTube Video'))
+        author = first_content.get('author', video_info.get('author', 'Unknown'))
+        thumbnail_url = first_content.get('thumbnail', video_info.get('thumbnail'))
+        duration = first_content.get('lengthSeconds', video_info.get('lengthSeconds'))
+    else:
+        title = video_info.get('title', 'YouTube Video')
+        author = video_info.get('author', 'Unknown')
+        duration = video_info.get('lengthSeconds')
+        thumbnails = video_info.get('thumbnail', [])
+        if thumbnails and isinstance(thumbnails, list):
+            thumbnail_url = thumbnails[0].get('url')
     
     metadata = VideoMetadata(
-        title=video_info.get('title', 'Unknown'),
+        title=title,
         description=video_info.get('description', ''),
-        duration=video_info.get('lengthSeconds'),
-        thumbnail_url=video_info.get('thumbnail', [{}])[0].get('url') if video_info.get('thumbnail') else None,
-        author=video_info.get('author', 'Unknown'),
-        view_count=video_info.get('viewCount'),
+        duration=duration,
+        thumbnail_url=thumbnail_url,
+        author=author,
+        view_count=view_count,
         platform='youtube'
     )
     
     download_options = []
+    
+    # Parse from contents array (new format)
+    for content in contents:
+        videos = content.get('videos', [])
+        for video in videos:
+            if video.get('url'):
+                download_options.append(DownloadOption(
+                    quality=video.get('label', video.get('quality', 'unknown')),
+                    format='video/mp4',
+                    url=video.get('url'),
+                    size=video.get('size')
+                ))
+    
+    # Fallback to renditions format
+    renditions = data.get('renditions', [])
     for r in renditions:
         if r.get('url'):
             download_options.append(DownloadOption(
