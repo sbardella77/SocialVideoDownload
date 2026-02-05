@@ -473,32 +473,53 @@ def parse_facebook_response(data: Dict[str, Any]) -> DownloadResponse:
     contents = data.get('contents', [])
     metadata_info = data.get('metadata', {})
     
+    # Extract metadata
+    title = metadata_info.get('title') or metadata_info.get('text', 'Facebook Video')
+    if title and len(title) > 100:
+        title = title[:100] + '...'
+    
+    author_info = metadata_info.get('author', {})
+    author = author_info.get('name', 'Unknown') if isinstance(author_info, dict) else 'Unknown'
+    
     metadata = VideoMetadata(
-        title=post.get('title') or post.get('text', 'Facebook Video')[:100],
-        description=post.get('text', ''),
-        thumbnail_url=post.get('thumbnail'),
-        author=post.get('author', {}).get('name', 'Unknown'),
+        title=title or 'Facebook Video',
+        description=metadata_info.get('text', ''),
+        thumbnail_url=metadata_info.get('thumbnailUrl'),
+        author=author,
         platform='facebook'
     )
     
     download_options = []
-    # HD version
-    hd_url = post.get('hdUrl') or post.get('hd_url')
-    if hd_url:
-        download_options.append(DownloadOption(
-            quality='HD',
-            format='video/mp4',
-            url=hd_url
-        ))
     
-    # SD version
-    sd_url = post.get('sdUrl') or post.get('sd_url') or post.get('video_url')
-    if sd_url:
-        download_options.append(DownloadOption(
-            quality='SD',
-            format='video/mp4',
-            url=sd_url
-        ))
+    # Parse from contents array
+    for content in contents:
+        videos = content.get('videos', [])
+        for video in videos:
+            if video.get('url'):
+                download_options.append(DownloadOption(
+                    quality=video.get('label', 'Original'),
+                    format='video/mp4',
+                    url=video.get('url'),
+                    size=video.get('metadata', {}).get('content_length_text')
+                ))
+    
+    # Fallback for old format
+    if not download_options:
+        post = data.get('post', data)
+        hd_url = post.get('hdUrl') or post.get('hd_url')
+        if hd_url:
+            download_options.append(DownloadOption(
+                quality='HD',
+                format='video/mp4',
+                url=hd_url
+            ))
+        sd_url = post.get('sdUrl') or post.get('sd_url') or post.get('video_url')
+        if sd_url:
+            download_options.append(DownloadOption(
+                quality='SD',
+                format='video/mp4',
+                url=sd_url
+            ))
     
     return DownloadResponse(
         success=True,
