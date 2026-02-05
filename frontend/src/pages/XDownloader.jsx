@@ -58,8 +58,10 @@ export default function XDownloader() {
               </svg>
               X Downloader
             </div>
+            <p className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-foreground">
+              Download X
+            </p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              Download X{" "}
               <span className="text-zinc-300">Videos & GIFs</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
