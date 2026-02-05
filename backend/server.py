@@ -214,34 +214,39 @@ async def fetch_facebook_video(url: str) -> Dict[str, Any]:
 
 def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse YouTube API response"""
-    # Handle the actual API response format
     contents = data.get('contents', [])
     metadata_info = data.get('metadata', {})
     
-    # Get video info from contents or direct videoInfo
-    title = 'YouTube Video'
-    author = 'Unknown'
-    thumbnail_url = None
-    duration = None
-    view_count = None
+    # Extract metadata from the new API format
+    title = metadata_info.get('title', 'YouTube Video')
+    thumbnail_url = metadata_info.get('thumbnailUrl')
+    author_info = metadata_info.get('author', {})
+    author = author_info.get('name', 'Unknown') if isinstance(author_info, dict) else 'Unknown'
+    additional_data = metadata_info.get('additionalData', {})
+    duration_str = additional_data.get('duration', '')
+    view_count_str = additional_data.get('view_count', '')
     
-    if contents:
-        first_content = contents[0] if contents else {}
-        title = first_content.get('title', video_info.get('title', 'YouTube Video'))
-        author = first_content.get('author', video_info.get('author', 'Unknown'))
-        thumbnail_url = first_content.get('thumbnail', video_info.get('thumbnail'))
-        duration = first_content.get('lengthSeconds', video_info.get('lengthSeconds'))
-    else:
-        title = video_info.get('title', 'YouTube Video')
-        author = video_info.get('author', 'Unknown')
-        duration = video_info.get('lengthSeconds')
-        thumbnails = video_info.get('thumbnail', [])
-        if thumbnails and isinstance(thumbnails, list):
-            thumbnail_url = thumbnails[0].get('url')
+    # Parse duration string like "00:03:33" to seconds
+    duration = None
+    if duration_str:
+        parts = duration_str.split(':')
+        if len(parts) == 3:
+            duration = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+        elif len(parts) == 2:
+            duration = int(parts[0]) * 60 + int(parts[1])
+    
+    # Parse view count
+    view_count = None
+    if view_count_str:
+        view_count_str = view_count_str.replace(',', '').replace(' ', '')
+        try:
+            view_count = int(view_count_str)
+        except:
+            pass
     
     metadata = VideoMetadata(
         title=title,
-        description=video_info.get('description', ''),
+        description=metadata_info.get('description', ''),
         duration=duration,
         thumbnail_url=thumbnail_url,
         author=author,
@@ -251,28 +256,35 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     
     download_options = []
     
-    # Parse from contents array (new format)
+    # Parse from contents array - prioritize renderableVideos (have audio merged)
     for content in contents:
+        # First try renderableVideos (these have video+audio merged)
+        renderable_videos = content.get('renderableVideos', [])
+        for video in renderable_videos:
+            render_config = video.get('renderConfig', {})
+            execution_url = render_config.get('executionUrl')
+            if execution_url:
+                video_meta = video.get('metadata', {})
+                download_options.append(DownloadOption(
+                    quality=f"{video.get('label', 'unknown')} (with audio)",
+                    format='video/mp4',
+                    url=execution_url,
+                    size=video_meta.get('content_length_text')
+                ))
+        
+        # Then regular videos (may not have audio)
         videos = content.get('videos', [])
         for video in videos:
             if video.get('url'):
+                video_meta = video.get('metadata', {})
+                mime_type = video_meta.get('mime_type', '')
+                has_audio = 'mp4a' in mime_type or 'audio' in mime_type.lower()
                 download_options.append(DownloadOption(
-                    quality=video.get('label', video.get('quality', 'unknown')),
+                    quality=f"{video.get('label', video_meta.get('quality_label', 'unknown'))}" + (' (video+audio)' if has_audio else ' (video only)'),
                     format='video/mp4',
                     url=video.get('url'),
-                    size=video.get('size')
+                    size=video_meta.get('content_length_text')
                 ))
-    
-    # Fallback to renditions format
-    renditions = data.get('renditions', [])
-    for r in renditions:
-        if r.get('url'):
-            download_options.append(DownloadOption(
-                quality=r.get('qualityLabel', r.get('quality', 'unknown')),
-                format=r.get('mimeType', 'video/mp4').split(';')[0],
-                url=r.get('url'),
-                size=r.get('contentLength')
-            ))
     
     return DownloadResponse(
         success=True,
@@ -283,11 +295,68 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     )
 
 def parse_instagram_response(data: Dict[str, Any]) -> DownloadResponse:
-    """Parse Instagram API response"""
-    post = data.get('post', data)
+    """Parse Instagram API response - new v3 format"""
+    contents = data.get('contents', [])
+    metadata_info = data.get('metadata', {})
+    
+    # Extract metadata
+    title = metadata_info.get('caption', 'Instagram Post')
+    if title and len(title) > 100:
+        title = title[:100] + '...'
+    
+    author_info = metadata_info.get('author', {})
+    author = author_info.get('username', 'Unknown') if isinstance(author_info, dict) else 'Unknown'
     
     metadata = VideoMetadata(
-        title=post.get('caption', '')[:100] if post.get('caption') else 'Instagram Post',
+        title=title or 'Instagram Post',
+        description=metadata_info.get('caption', ''),
+        thumbnail_url=metadata_info.get('thumbnailUrl'),
+        author=author,
+        platform='instagram'
+    )
+    
+    download_options = []
+    
+    # Parse from contents array
+    for content in contents:
+        # Videos
+        videos = content.get('videos', [])
+        for video in videos:
+            if video.get('url'):
+                download_options.append(DownloadOption(
+                    quality=video.get('label', 'Original'),
+                    format='video/mp4',
+                    url=video.get('url'),
+                    size=video.get('metadata', {}).get('content_length_text')
+                ))
+        
+        # Images (for posts without video)
+        images = content.get('images', [])
+        for img in images:
+            if img.get('url'):
+                download_options.append(DownloadOption(
+                    quality=img.get('label', 'Original'),
+                    format='image/jpeg',
+                    url=img.get('url')
+                ))
+    
+    # Fallback for old format
+    if not download_options:
+        post = data.get('post', data)
+        video_url = post.get('videoUrl') or post.get('video_url')
+        if video_url:
+            download_options.append(DownloadOption(
+                quality='Original',
+                format='video/mp4',
+                url=video_url
+            ))
+        image_url = post.get('displayUrl') or post.get('image_url')
+        if image_url and not video_url:
+            download_options.append(DownloadOption(
+                quality='Original',
+                format='image/jpeg',
+                url=image_url
+            ))
         description=post.get('caption', ''),
         thumbnail_url=post.get('thumbnail') or post.get('displayUrl'),
         author=post.get('owner', {}).get('username', 'Unknown'),
