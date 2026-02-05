@@ -455,6 +455,17 @@ def parse_tiktok_response(data: Dict[str, Any]) -> DownloadResponse:
 
 def parse_twitter_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse Twitter/X API response"""
+    # Check for API errors first
+    error = data.get('error')
+    if error:
+        error_msg = error.get('message', 'Unknown error') if isinstance(error, dict) else str(error)
+        return DownloadResponse(
+            success=False,
+            message=f"Twitter error: {error_msg}",
+            platform='twitter',
+            error=error_msg
+        )
+    
     # This API might not support Twitter yet - provide graceful fallback
     contents = data.get('contents', [])
     metadata_info = data.get('metadata', {})
