@@ -511,6 +511,17 @@ def parse_twitter_response(data: Dict[str, Any]) -> DownloadResponse:
 
 def parse_facebook_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse Facebook API response - v3 format"""
+    # Check for API errors first
+    error = data.get('error')
+    if error:
+        error_msg = error.get('message', 'Unknown error') if isinstance(error, dict) else str(error)
+        return DownloadResponse(
+            success=False,
+            message=f"Facebook error: {error_msg}",
+            platform='facebook',
+            error=error_msg
+        )
+    
     contents = data.get('contents', [])
     metadata_info = data.get('metadata', {})
     
