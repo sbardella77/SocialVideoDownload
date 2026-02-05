@@ -371,33 +371,49 @@ def parse_tiktok_response(data: Dict[str, Any]) -> DownloadResponse:
     contents = data.get('contents', [])
     metadata_info = data.get('metadata', {})
     
+    # Extract metadata
+    title = metadata_info.get('description', 'TikTok Video')
+    if title and len(title) > 100:
+        title = title[:100] + '...'
+    
+    author_info = metadata_info.get('author', {})
+    author = author_info.get('nickname') or author_info.get('uniqueId', 'Unknown') if isinstance(author_info, dict) else 'Unknown'
+    stats = metadata_info.get('stats', {})
+    
     metadata = VideoMetadata(
-        title=video.get('desc', video.get('description', 'TikTok Video'))[:100],
-        description=video.get('desc', video.get('description', '')),
-        duration=video.get('duration'),
-        thumbnail_url=video.get('cover') or video.get('thumbnail'),
-        author=author.get('nickname') or author.get('uniqueId', 'Unknown'),
-        view_count=video.get('playCount') or video.get('stats', {}).get('playCount'),
+        title=title or 'TikTok Video',
+        description=metadata_info.get('description', ''),
+        duration=metadata_info.get('duration'),
+        thumbnail_url=metadata_info.get('cover') or metadata_info.get('thumbnailUrl'),
+        author=author,
+        view_count=stats.get('playCount'),
         platform='tiktok'
     )
     
     download_options = []
-    play_url = video.get('playAddr') or video.get('downloadAddr') or video.get('video_url')
-    if play_url:
-        download_options.append(DownloadOption(
-            quality='Original (No Watermark)',
-            format='video/mp4',
-            url=play_url
-        ))
     
-    # Watermarked version
-    watermark_url = video.get('downloadAddr')
-    if watermark_url and watermark_url != play_url:
-        download_options.append(DownloadOption(
-            quality='With Watermark',
-            format='video/mp4',
-            url=watermark_url
-        ))
+    # Parse from contents array
+    for content in contents:
+        videos = content.get('videos', [])
+        for video in videos:
+            if video.get('url'):
+                download_options.append(DownloadOption(
+                    quality=video.get('label', 'Original'),
+                    format='video/mp4',
+                    url=video.get('url'),
+                    size=video.get('metadata', {}).get('content_length_text')
+                ))
+    
+    # Fallback for old format
+    if not download_options:
+        video = data.get('video', data)
+        play_url = video.get('playAddr') or video.get('downloadAddr') or video.get('video_url')
+        if play_url:
+            download_options.append(DownloadOption(
+                quality='Original (No Watermark)',
+                format='video/mp4',
+                url=play_url
+            ))
     
     return DownloadResponse(
         success=True,
