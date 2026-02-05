@@ -9,13 +9,13 @@ import AdPlaceholder from "@/components/AdPlaceholder";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-export default function TwitterDownloader() {
+export default function XDownloader() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
   const handleDownload = useCallback(async (url) => {
     if (!url.includes("twitter.com") && !url.includes("x.com") && !url.includes("t.co")) {
-      toast.error("Please enter a valid Twitter/X URL");
+      toast.error("Please enter a valid X URL");
       return;
     }
 
@@ -42,28 +42,28 @@ export default function TwitterDownloader() {
   }, []);
 
   return (
-    <div className="min-h-screen" data-testid="twitter-page">
+    <div className="min-h-screen" data-testid="x-page">
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent" />
-          <div className="absolute top-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-zinc-500/10 via-transparent to-transparent" />
+          <div className="absolute top-0 left-1/3 w-96 h-96 bg-zinc-500/10 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-500/10 text-zinc-300 text-sm font-medium mb-6">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
-              Twitter/X Downloader
+              X Downloader
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              Download Twitter/X{" "}
-              <span className="text-blue-400">Videos & GIFs</span>
+              Download X{" "}
+              <span className="text-zinc-300">Videos & GIFs</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Save videos and GIFs from Twitter/X in high quality. Fast, free, and works with any public tweet.
+              Save videos and GIFs from X in high quality. Fast, free, and works with any public post.
             </p>
           </div>
 
@@ -71,7 +71,7 @@ export default function TwitterDownloader() {
             <HeroInput
               onSubmit={handleDownload}
               loading={loading}
-              placeholder="Paste Twitter/X post URL here..."
+              placeholder="Paste X post URL here..."
             />
           </div>
 
@@ -93,7 +93,7 @@ export default function TwitterDownloader() {
       {/* How To Section */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <HowToSection platform="twitter" />
+          <HowToSection platform="x" />
         </div>
       </section>
 
@@ -102,7 +102,7 @@ export default function TwitterDownloader() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
             <div className="lg:col-span-3">
-              <FAQSection platform="twitter" />
+              <FAQSection platform="x" />
             </div>
             <div className="lg:col-span-1">
               <div className="sticky top-24">
@@ -118,17 +118,17 @@ export default function TwitterDownloader() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              Best Twitter/X Video Downloader Online
+              Best X Video Downloader Online
             </h2>
             <div className="prose prose-invert prose-lg max-w-none text-muted-foreground">
               <p className="mb-4">
-                SaveFlex makes it easy to download videos and GIFs from Twitter (now X). Save viral videos, news clips, sports highlights, and more from any public tweet.
+                SaveFlex makes it easy to download videos and GIFs from X (formerly Twitter). Save viral videos, news clips, sports highlights, and more from any public post.
               </p>
               <p className="mb-4">
-                Our Twitter video downloader supports multiple quality options when available, letting you choose between different bitrates for the best balance of quality and file size.
+                Our X video downloader supports multiple quality options when available, letting you choose between different bitrates for the best balance of quality and file size.
               </p>
               <p>
-                Works with both twitter.com and x.com URLs. Just paste the tweet link containing the video or GIF you want to save and download instantly.
+                Works with both x.com and twitter.com URLs. Just paste the post link containing the video or GIF you want to save and download instantly.
               </p>
             </div>
           </div>
