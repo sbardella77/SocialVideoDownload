@@ -85,16 +85,28 @@ const platformFaqs = {
         "Open the TikTok video, tap 'Share', then 'Copy Link'. Paste this link into SaveFlex to download.",
     },
   ],
-  twitter: [
+  x: [
     {
-      question: "How do I download Twitter/X videos?",
+      question: "How do I download X videos?",
       answer:
-        "Click the share button on a Twitter/X post containing a video, select 'Copy link to post', and paste it into SaveFlex.",
+        "Click the share button on an X post containing a video, select 'Copy link to post', and paste it into SaveFlex.",
     },
     {
-      question: "Can I download GIFs from Twitter?",
+      question: "Can I download GIFs from X?",
       answer:
-        "Yes! SaveFlex supports downloading both videos and GIFs from Twitter/X posts.",
+        "Yes! SaveFlex supports downloading both videos and GIFs from X posts.",
+    },
+  ],
+  twitter: [
+    {
+      question: "How do I download X videos?",
+      answer:
+        "Click the share button on an X post containing a video, select 'Copy link to post', and paste it into SaveFlex.",
+    },
+    {
+      question: "Can I download GIFs from X?",
+      answer:
+        "Yes! SaveFlex supports downloading both videos and GIFs from X posts.",
     },
   ],
   facebook: [
