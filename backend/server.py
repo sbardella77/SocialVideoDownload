@@ -387,6 +387,17 @@ def parse_instagram_response(data: Dict[str, Any]) -> DownloadResponse:
 
 def parse_tiktok_response(data: Dict[str, Any]) -> DownloadResponse:
     """Parse TikTok API response - new v3 format"""
+    # Check for API errors first
+    error = data.get('error')
+    if error:
+        error_msg = error.get('message', 'Unknown error') if isinstance(error, dict) else str(error)
+        return DownloadResponse(
+            success=False,
+            message=f"TikTok error: {error_msg}",
+            platform='tiktok',
+            error=error_msg
+        )
+    
     contents = data.get('contents', [])
     metadata_info = data.get('metadata', {})
     
