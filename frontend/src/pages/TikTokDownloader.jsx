@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback,useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import HeroInput from "@/components/HeroInput";

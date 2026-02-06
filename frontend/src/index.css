@@ -186,3 +186,18 @@
         border-bottom-width: inherit;
     }
 }
+
+/* ============================
+   SEO STATIC CONTENT (SAFE)
+   ============================ */
+#seo-content,
+#seo-preload-tiktok {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
