@@ -265,61 +265,48 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     
     # Parse from contents array
     for content in contents:
-        # PRIORITY 1: Check for pre-rendered videos with audio (direct URLs)
-        renderable_videos = content.get('renderableVideos', [])
-        for video in renderable_videos:
-            render_config = video.get('renderConfig', {})
-            video_meta = video.get('metadata', {})
-            
-            # Skip if there's an error or no audio
-            if video.get('error') or not video_meta.get('has_audio'):
-                continue
-            
-            # Check if we have a direct download URL (already rendered)
-            direct_url = render_config.get('directUrl') or render_config.get('downloadUrl')
-            if direct_url:
-                download_options.append(DownloadOption(
-                    quality=f"{video.get('label', 'unknown')} (HD with Audio)",
-                    format='video/mp4',
-                    url=direct_url,
-                    size=video_meta.get('content_length_text')
-                ))
-        
-        # PRIORITY 2: Regular videos - find ones WITH audio
+        # Get best quality videos (limit to avoid too many options)
         videos = content.get('videos', [])
+        seen_labels = set()
+        
         for video in videos:
             if video.get('url'):
                 video_meta = video.get('metadata', {})
-                has_audio = video_meta.get('has_audio', False)
                 label = video.get('label', video_meta.get('quality_label', 'unknown'))
+                mime = video_meta.get('mime_type', '')
                 
-                # Prioritize videos with audio
-                if has_audio:
-                    download_options.insert(0, DownloadOption(
-                        quality=f"{label} (Video + Audio)",
-                        format='video/mp4',
-                        url=video.get('url'),
-                        size=video_meta.get('content_length_text')
-                    ))
-                else:
-                    download_options.append(DownloadOption(
-                        quality=f"{label} (Video Only)",
-                        format='video/mp4',
-                        url=video.get('url'),
-                        size=video_meta.get('content_length_text')
-                    ))
-        
-        # PRIORITY 3: Audio tracks (for users who want audio only)
-        audios = content.get('audios', [])
-        for audio in audios[:2]:  # Limit to 2 audio options
-            if audio.get('url'):
-                audio_meta = audio.get('metadata', {})
+                # Prefer MP4 format, skip duplicates
+                if label in seen_labels:
+                    continue
+                if 'mp4' not in mime.lower() and 'video/mp4' not in mime.lower():
+                    continue
+                    
+                seen_labels.add(label)
                 download_options.append(DownloadOption(
-                    quality=f"Audio Only ({audio_meta.get('audio_quality', 'unknown')})",
+                    quality=f"{label} (Video)",
+                    format='video/mp4',
+                    url=video.get('url'),
+                    size=video_meta.get('content_length_text')
+                ))
+        
+        # Add audio options
+        audios = content.get('audios', [])
+        audio_added = False
+        for audio in audios:
+            if audio.get('url') and not audio_added:
+                audio_meta = audio.get('metadata', {})
+                quality = audio_meta.get('audio_quality', 'MEDIUM').replace('AUDIO_QUALITY_', '')
+                download_options.append(DownloadOption(
+                    quality=f"Audio Only ({quality})",
                     format='audio/mp4',
                     url=audio.get('url'),
                     size=audio_meta.get('content_length_text')
                 ))
+                audio_added = True
+    
+    # Sort by quality (higher first)
+    quality_order = {'2160p': 0, '1440p': 1, '1080p': 2, '720p': 3, '480p': 4, '360p': 5, '240p': 6, '144p': 7}
+    download_options.sort(key=lambda x: quality_order.get(x.quality.split(' ')[0], 99))
     
     return DownloadResponse(
         success=True,
