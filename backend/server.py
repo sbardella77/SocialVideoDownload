@@ -125,18 +125,14 @@ def extract_video_id(url: str, platform: str) -> Optional[str]:
 
 # API Helper Functions
 async def fetch_youtube_video(url: str) -> Dict[str, Any]:
-    """Fetch YouTube video details"""
+    """Fetch YouTube video details using YTStream API (includes video+audio)"""
     video_id = extract_video_id(url, 'youtube')
     headers = {
         "x-rapidapi-key": RAPIDAPI_KEY,
-        "x-rapidapi-host": RAPIDAPI_HOST
+        "x-rapidapi-host": YTSTREAM_HOST
     }
-    api_url = f"https://{RAPIDAPI_HOST}/youtube/v3/video/details"
-    params = {
-        "videoId": video_id,
-        "urlAccess": "proxied",
-        "getTranscript": "false"
-    }
+    api_url = f"https://{YTSTREAM_HOST}/dl"
+    params = {"id": video_id}
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(api_url, headers=headers, params=params)
         response.raise_for_status()
