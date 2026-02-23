@@ -287,7 +287,7 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
                 seen_qualities.add(quality_label)
                 format_type = 'mp4' if 'mp4' in mime_type else 'webm'
                 download_options.append(DownloadOption(
-                    quality=f"{quality_label} (Video Only - {format_type.upper()})",
+                    quality=f"{quality_label} (Video)",
                     format=f'video/{format_type}',
                     url=fmt.get('url'),
                     size=fmt.get('contentLength')
