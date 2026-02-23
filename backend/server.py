@@ -756,6 +756,72 @@ async def get_stats():
         "by_platform": {item["_id"]: item["count"] for item in platforms_stats}
     }
 
+@api_router.get("/proxy-download")
+@limiter.limit("10/minute")
+async def proxy_download(
+    request: Request,
+    url: str = Query(..., description="Video URL to download"),
+    filename: str = Query("video.mp4", description="Filename for download")
+):
+    """
+    Proxy download endpoint that streams video with proper headers for mobile download.
+    Forces browser to download instead of playing the video.
+    """
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
+    
+    # Decode URL if it's encoded
+    decoded_url = urllib.parse.unquote(url)
+    
+    # Sanitize filename
+    safe_filename = re.sub(r'[^\w\s\-\.]', '', filename)
+    if not safe_filename:
+        safe_filename = "video.mp4"
+    if not safe_filename.endswith(('.mp4', '.webm', '.mp3', '.m4a')):
+        safe_filename += ".mp4"
+    
+    async def stream_video():
+        """Stream video content from source URL"""
+        try:
+            async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
+                async with client.stream("GET", decoded_url) as response:
+                    response.raise_for_status()
+                    async for chunk in response.aiter_bytes(chunk_size=65536):
+                        yield chunk
+        except Exception as e:
+            logger.error(f"Error streaming video: {str(e)}")
+            raise
+    
+    try:
+        # First, make a HEAD request to get content info
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+            head_response = await client.head(decoded_url)
+            content_type = head_response.headers.get("content-type", "video/mp4")
+            content_length = head_response.headers.get("content-length")
+        
+        headers = {
+            "Content-Disposition": f'attachment; filename="{safe_filename}"',
+            "Content-Type": content_type,
+            "Cache-Control": "no-cache",
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
+        
+        if content_length:
+            headers["Content-Length"] = content_length
+        
+        return StreamingResponse(
+            stream_video(),
+            headers=headers,
+            media_type=content_type
+        )
+        
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error during proxy download: {e.response.status_code}")
+        raise HTTPException(status_code=502, detail="Failed to fetch video from source")
+    except Exception as e:
+        logger.error(f"Error in proxy download: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process download")
+
 # Include the router
 app.include_router(api_router)
 
