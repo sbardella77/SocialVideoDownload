@@ -209,99 +209,119 @@ async def fetch_facebook_video(url: str) -> Dict[str, Any]:
         return response.json()
 
 def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
-    """Parse YouTube API response"""
-    contents = data.get('contents', [])
-    metadata_info = data.get('metadata', {})
+    """Parse YTStream API response - includes video+audio merged formats"""
     
-    # Extract metadata from the new API format
-    title = metadata_info.get('title', 'YouTube Video')
-    thumbnail_url = metadata_info.get('thumbnailUrl')
-    author_info = metadata_info.get('author', {})
-    author = author_info.get('name', 'Unknown') if isinstance(author_info, dict) else 'Unknown'
-    additional_data = metadata_info.get('additionalData', {})
-    view_count_raw = additional_data.get('view_count', '')
+    # Check for errors
+    if data.get('status') != 'OK':
+        error_msg = data.get('message', 'Failed to fetch video')
+        return DownloadResponse(
+            success=False,
+            message=error_msg,
+            platform='youtube',
+            error=error_msg
+        )
     
-    # Parse duration 
+    # Extract metadata
+    title = data.get('title', 'YouTube Video')
+    channel = data.get('channelTitle', 'Unknown')
+    duration_seconds = data.get('lengthSeconds')
+    
+    # Parse duration
     duration = None
-    duration_val = additional_data.get('duration')
-    if duration_val:
-        if isinstance(duration_val, int):
-            duration = duration_val
-        elif isinstance(duration_val, str):
-            parts = duration_val.split(':')
-            try:
-                if len(parts) == 3:
-                    duration = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
-                elif len(parts) == 2:
-                    duration = int(parts[0]) * 60 + int(parts[1])
-            except:
-                pass
-    
-    # Parse view count
-    view_count = None
-    if view_count_raw:
-        view_count_str = str(view_count_raw).replace(',', '').replace(' ', '')
+    if duration_seconds:
         try:
-            view_count = int(view_count_str)
+            duration = int(duration_seconds)
         except:
             pass
     
+    # Get thumbnail
+    thumbnails = data.get('thumbnail', [])
+    thumbnail_url = None
+    if thumbnails and isinstance(thumbnails, list):
+        thumbnail_url = thumbnails[-1].get('url')  # Get highest quality thumbnail
+    
     metadata = VideoMetadata(
         title=title,
-        description=metadata_info.get('description', ''),
+        description=data.get('description', '')[:500],
         duration=duration,
         thumbnail_url=thumbnail_url,
-        author=author,
-        view_count=view_count,
+        author=channel,
+        view_count=None,
         platform='youtube'
     )
     
     download_options = []
     
-    # Parse from contents array
-    for content in contents:
-        # Get best quality videos (limit to avoid too many options)
-        videos = content.get('videos', [])
-        seen_labels = set()
-        
-        for video in videos:
-            if video.get('url'):
-                video_meta = video.get('metadata', {})
-                label = video.get('label', video_meta.get('quality_label', 'unknown'))
-                mime = video_meta.get('mime_type', '')
-                
-                # Prefer MP4 format, skip duplicates
-                if label in seen_labels:
-                    continue
-                if 'mp4' not in mime.lower() and 'video/mp4' not in mime.lower():
-                    continue
-                    
-                seen_labels.add(label)
+    # PRIORITY 1: formats - these have VIDEO + AUDIO combined!
+    formats = data.get('formats', [])
+    for fmt in formats:
+        if fmt.get('url'):
+            quality_label = fmt.get('qualityLabel', 'unknown')
+            audio_quality = fmt.get('audioQuality', '')
+            
+            # Only add if has audio
+            if audio_quality:
                 download_options.append(DownloadOption(
-                    quality=f"{label} (Video)",
+                    quality=f"{quality_label} (Video + Audio)",
                     format='video/mp4',
-                    url=video.get('url'),
-                    size=video_meta.get('content_length_text')
+                    url=fmt.get('url'),
+                    size=fmt.get('contentLength')
                 ))
-        
-        # Add audio options
-        audios = content.get('audios', [])
-        audio_added = False
-        for audio in audios:
-            if audio.get('url') and not audio_added:
-                audio_meta = audio.get('metadata', {})
-                quality = audio_meta.get('audio_quality', 'MEDIUM').replace('AUDIO_QUALITY_', '')
-                download_options.append(DownloadOption(
-                    quality=f"Audio Only ({quality})",
-                    format='audio/mp4',
-                    url=audio.get('url'),
-                    size=audio_meta.get('content_length_text')
-                ))
-                audio_added = True
     
-    # Sort by quality (higher first)
-    quality_order = {'2160p': 0, '1440p': 1, '1080p': 2, '720p': 3, '480p': 4, '360p': 5, '240p': 6, '144p': 7}
-    download_options.sort(key=lambda x: quality_order.get(x.quality.split(' ')[0], 99))
+    # PRIORITY 2: adaptiveFormats - video only (higher quality options)
+    adaptive = data.get('adaptiveFormats', [])
+    seen_qualities = set()
+    
+    for fmt in adaptive:
+        if fmt.get('url'):
+            mime_type = fmt.get('mimeType', '')
+            quality_label = fmt.get('qualityLabel')
+            
+            # Only video formats, prefer MP4
+            if quality_label and 'video' in mime_type:
+                if quality_label in seen_qualities:
+                    continue
+                if 'mp4' not in mime_type and 'webm' not in mime_type:
+                    continue
+                
+                seen_qualities.add(quality_label)
+                format_type = 'mp4' if 'mp4' in mime_type else 'webm'
+                download_options.append(DownloadOption(
+                    quality=f"{quality_label} (Video Only - {format_type.upper()})",
+                    format=f'video/{format_type}',
+                    url=fmt.get('url'),
+                    size=fmt.get('contentLength')
+                ))
+    
+    # PRIORITY 3: Audio only options
+    for fmt in adaptive:
+        if fmt.get('url'):
+            mime_type = fmt.get('mimeType', '')
+            if 'audio' in mime_type:
+                audio_quality = fmt.get('audioQuality', 'MEDIUM').replace('AUDIO_QUALITY_', '')
+                bitrate = fmt.get('bitrate', 0)
+                if bitrate > 100000:  # Only high quality audio
+                    download_options.append(DownloadOption(
+                        quality=f"Audio Only ({audio_quality})",
+                        format='audio/mp4',
+                        url=fmt.get('url'),
+                        size=fmt.get('contentLength')
+                    ))
+                    break  # Only add one audio option
+    
+    # Sort: Video+Audio first, then by quality
+    def sort_key(opt):
+        quality = opt.quality
+        if 'Video + Audio' in quality:
+            return (0, quality)
+        elif 'Video Only' in quality:
+            q = quality.split(' ')[0]
+            order = {'2160p': 1, '1440p': 2, '1080p': 3, '720p': 4, '480p': 5, '360p': 6}
+            return (1, order.get(q, 99))
+        else:
+            return (2, quality)
+    
+    download_options.sort(key=sort_key)
     
     return DownloadResponse(
         success=True,
