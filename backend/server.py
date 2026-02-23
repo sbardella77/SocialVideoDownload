@@ -27,6 +27,7 @@ db = client[os.environ['DB_NAME']]
 # RapidAPI config
 RAPIDAPI_KEY = os.environ.get('RAPIDAPI_KEY', '')
 RAPIDAPI_HOST = os.environ.get('RAPIDAPI_HOST', 'social-media-video-downloader.p.rapidapi.com')
+YTSTREAM_HOST = "ytstream-download-youtube-videos.p.rapidapi.com"
 
 # Rate limiter
 limiter = Limiter(key_func=get_remote_address)
