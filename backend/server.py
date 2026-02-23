@@ -265,33 +265,60 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
     
     # Parse from contents array
     for content in contents:
-        # PRIORITY 1: renderableVideos - these have BOTH video AND audio merged
+        # PRIORITY 1: Check for pre-rendered videos with audio (direct URLs)
         renderable_videos = content.get('renderableVideos', [])
         for video in renderable_videos:
             render_config = video.get('renderConfig', {})
-            execution_url = render_config.get('executionUrl')
             video_meta = video.get('metadata', {})
             
-            # Only add if has audio and no error
-            if execution_url and video_meta.get('has_audio') and not video.get('error'):
+            # Skip if there's an error or no audio
+            if video.get('error') or not video_meta.get('has_audio'):
+                continue
+            
+            # Check if we have a direct download URL (already rendered)
+            direct_url = render_config.get('directUrl') or render_config.get('downloadUrl')
+            if direct_url:
                 download_options.append(DownloadOption(
                     quality=f"{video.get('label', 'unknown')} (HD with Audio)",
                     format='video/mp4',
-                    url=execution_url,
+                    url=direct_url,
                     size=video_meta.get('content_length_text')
                 ))
         
-        # PRIORITY 2: Regular videos (video only - no audio)
+        # PRIORITY 2: Regular videos - find ones WITH audio
         videos = content.get('videos', [])
         for video in videos:
             if video.get('url'):
                 video_meta = video.get('metadata', {})
+                has_audio = video_meta.get('has_audio', False)
                 label = video.get('label', video_meta.get('quality_label', 'unknown'))
+                
+                # Prioritize videos with audio
+                if has_audio:
+                    download_options.insert(0, DownloadOption(
+                        quality=f"{label} (Video + Audio)",
+                        format='video/mp4',
+                        url=video.get('url'),
+                        size=video_meta.get('content_length_text')
+                    ))
+                else:
+                    download_options.append(DownloadOption(
+                        quality=f"{label} (Video Only)",
+                        format='video/mp4',
+                        url=video.get('url'),
+                        size=video_meta.get('content_length_text')
+                    ))
+        
+        # PRIORITY 3: Audio tracks (for users who want audio only)
+        audios = content.get('audios', [])
+        for audio in audios[:2]:  # Limit to 2 audio options
+            if audio.get('url'):
+                audio_meta = audio.get('metadata', {})
                 download_options.append(DownloadOption(
-                    quality=f"{label} (Video Only)",
-                    format='video/mp4',
-                    url=video.get('url'),
-                    size=video_meta.get('content_length_text')
+                    quality=f"Audio Only ({audio_meta.get('audio_quality', 'unknown')})",
+                    format='audio/mp4',
+                    url=audio.get('url'),
+                    size=audio_meta.get('content_length_text')
                 ))
     
     return DownloadResponse(
