@@ -314,9 +314,9 @@ def parse_youtube_response(data: Dict[str, Any]) -> DownloadResponse:
         quality = opt.quality
         if 'Video + Audio' in quality:
             return (0, quality)
-        elif 'Video Only' in quality:
+        elif '(Video)' in quality or 'Video Only' in quality:
             q = quality.split(' ')[0]
-            order = {'2160p': 1, '1440p': 2, '1080p': 3, '720p': 4, '480p': 5, '360p': 6}
+            order = {'2160p': 1, '1440p': 2, '1080p': 3, '720p': 4, '480p': 5, '360p': 6, '240p': 7, '144p': 8}
             return (1, order.get(q, 99))
         else:
             return (2, quality)
