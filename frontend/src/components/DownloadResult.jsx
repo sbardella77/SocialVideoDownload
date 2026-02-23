@@ -1,23 +1,73 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, ExternalLink, CheckCircle, Image, Film } from "lucide-react";
+import { Download, CheckCircle, Image, Film, Smartphone } from "lucide-react";
 import { toast } from "sonner";
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export const DownloadResult = ({ result }) => {
   if (!result || !result.success) return null;
 
   const { metadata, download_options, platform } = result;
 
-  const handleDownload = (url, quality) => {
-    window.open(url, "_blank");
-    toast.success(`Starting download: ${quality}`);
+  // Generate safe filename from title
+  const generateFilename = (title, format) => {
+    const safeName = (title || "video")
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "_")
+      .substring(0, 50);
+    const ext = format?.includes("audio") ? "mp3" : "mp4";
+    return `${safeName}.${ext}`;
+  };
+
+  // Use proxy download for mobile compatibility
+  const handleDownload = (url, quality, format) => {
+    const filename = generateFilename(metadata?.title, format);
+    
+    // Check if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Use proxy endpoint for mobile - forces download
+      const proxyUrl = `${API_URL}/api/proxy-download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+      
+      // Create a temporary link and click it
+      const link = document.createElement("a");
+      link.href = proxyUrl;
+      link.download = filename;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success(`Downloading: ${quality}`, {
+        description: "Check your downloads folder",
+        icon: <Smartphone className="w-4 h-4" />
+      });
+    } else {
+      // Desktop: use proxy for consistent behavior
+      const proxyUrl = `${API_URL}/api/proxy-download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+      
+      const link = document.createElement("a");
+      link.href = proxyUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success(`Starting download: ${quality}`);
+    }
   };
 
   const formatDuration = (seconds) => {
     if (!seconds) return null;
-    const mins = Math.floor(seconds / 60);
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
+    if (hrs > 0) {
+      return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    }
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
@@ -26,6 +76,16 @@ export const DownloadResult = ({ result }) => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M views`;
     if (views >= 1000) return `${(views / 1000).toFixed(1)}K views`;
     return `${views} views`;
+  };
+
+  const formatSize = (bytes) => {
+    if (!bytes) return null;
+    const size = parseInt(bytes);
+    if (isNaN(size)) return null;
+    if (size >= 1073741824) return `${(size / 1073741824).toFixed(1)} GB`;
+    if (size >= 1048576) return `${(size / 1048576).toFixed(1)} MB`;
+    if (size >= 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${size} B`;
   };
 
   return (
@@ -92,21 +152,23 @@ export const DownloadResult = ({ result }) => {
                   key={index}
                   variant="outline"
                   className="justify-between h-auto py-3 px-4 hover:bg-primary/5 hover:border-primary/50 group"
-                  onClick={() => handleDownload(option.url, option.quality)}
+                  onClick={() => handleDownload(option.url, option.quality, option.format)}
                   data-testid={`download-option-${index}`}
                 >
                   <span className="flex items-center gap-2">
-                    {option.format?.includes("image") ? (
+                    {option.format?.includes("audio") ? (
+                      <Film className="w-4 h-4 text-muted-foreground" />
+                    ) : option.format?.includes("image") ? (
                       <Image className="w-4 h-4 text-muted-foreground" />
                     ) : (
                       <Film className="w-4 h-4 text-muted-foreground" />
                     )}
-                    <span className="font-medium">{option.quality}</span>
+                    <span className="font-medium text-left">{option.quality}</span>
                   </span>
                   <span className="flex items-center gap-2 text-muted-foreground group-hover:text-primary">
                     {option.size && (
                       <span className="text-xs">
-                        {(parseInt(option.size) / 1048576).toFixed(1)}MB
+                        {formatSize(option.size)}
                       </span>
                     )}
                     <Download className="w-4 h-4" />
@@ -117,19 +179,21 @@ export const DownloadResult = ({ result }) => {
           </div>
         )}
 
-        {/* Direct Link */}
+        {/* Main Download Button */}
         {download_options && download_options[0]?.url && (
           <div className="mt-4 pt-4 border-t border-border/50">
             <Button
               className="w-full gap-2 bg-primary hover:bg-primary/90"
               size="lg"
-              onClick={() => handleDownload(download_options[0].url, "Best Quality")}
+              onClick={() => handleDownload(download_options[0].url, download_options[0].quality, download_options[0].format)}
               data-testid="download-best-btn"
             >
               <Download className="w-5 h-5" />
-              Download Best Quality
-              <ExternalLink className="w-4 h-4 ml-1" />
+              Download {download_options[0].quality.includes("Audio") ? "Best Audio" : "Best Quality"}
             </Button>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Works on mobile, tablet & desktop
+            </p>
           </div>
         )}
       </CardContent>
