@@ -13,89 +13,98 @@ Build a Snapinsta-like downloader platform with:
 ### Tech Stack
 - **Frontend**: React 19 + Tailwind CSS + Shadcn/UI
 - **Backend**: FastAPI (Python)
-- **Database**: MongoDB (for caching)
-- **API**: RapidAPI Social Media Video Downloader
+- **Database**: MongoDB (caching + stats)
+- **APIs**: RapidAPI Social Media Video Downloader (Instagram/TikTok/X/Facebook) + YTStream (YouTube)
+- **Ads**: Monetag Multitag (zone 10618740) + In-Page Push via sw.js
+- **SEO**: Dynamic JSON-LD (FAQPage, BreadcrumbList, SoftwareApplication, WebSite, HowTo)
 
 ### Key Design Decisions
-1. **SEO Landing Pages**: Dedicated pages per platform for better search rankings
-2. **Stateless Design**: No user accounts required
-3. **Cost Control**: 1-hour caching, 30 requests/minute rate limiting
-4. **Ad-Ready**: Placeholder zones for future AdSense integration
+1. SEO landing pages per platform (/youtube-downloader, /tiktok-downloader, etc.)
+2. Stateless: no user accounts, no DB-persisted user data
+3. Cost control: 1-hour response cache, 30 req/min rate limit, 10 req/min on proxy download
+4. Mobile-first: proxied streaming download with `Content-Disposition: attachment` so iOS/Android save the file directly
+5. Ads: single Monetag Multitag covers all formats automatically
 
-## User Personas
-1. **Casual User**: Downloads occasional videos for personal use
-2. **Content Creator**: Backs up their own content
-3. **Social Media Manager**: Needs quick downloads for work
-4. **Mobile User**: Primary traffic source, mobile-first design
-
-## Core Requirements (Static)
-- Multi-platform support (YouTube, Instagram, TikTok, Twitter/X, Facebook)
+## Core Requirements
+- Multi-platform support (YouTube, Instagram, TikTok, X, Facebook)
 - Auto-detection of platform from URL
-- Multiple quality options
+- Multiple quality options + audio-only (YouTube)
+- Watermark-free TikTok
 - Fast, anonymous downloads
-- Mobile responsive design
-- SEO-optimized pages
+- Mobile responsive + mobile downloads work
+- SEO-optimised with structured data
 
-## What's Been Implemented (Feb 2026)
+## What's Been Implemented
 
-### Backend
-- [x] FastAPI server with /api prefix
-- [x] Platform auto-detection from URL
-- [x] YouTube download with quality options (up to 4K)
-- [x] Instagram download (posts, reels, stories)
-- [x] TikTok download (with watermark removal)
-- [x] Twitter/X download (videos and GIFs)
-- [x] Facebook download (HD and SD)
-- [x] Rate limiting (30 req/minute)
-- [x] Response caching (1 hour TTL)
-- [x] Health and stats endpoints
+### Backend (FastAPI)
+- [x] /api/health, /api/platforms, /api/stats
+- [x] POST /api/download — auto-detects platform, returns metadata + download options
+- [x] GET /api/proxy-download — streams remote file with `Content-Disposition: attachment` (forces mobile save)
+- [x] Rate limiting (slowapi): 30/min /api/download, 10/min /api/proxy-download
+- [x] MongoDB response cache (1h TTL)
+- [x] YouTube via YTStream API (combined Video+Audio + audio-only)
+- [x] Instagram/TikTok/X/Facebook via RapidAPI Social Media Video Downloader
 
-### Frontend
-- [x] Modern dark theme (Deep Zinc)
-- [x] Homepage with hero input
-- [x] Platform cards grid
-- [x] Download result component with quality options
-- [x] 5 dedicated SEO landing pages
-- [x] FAQ accordion sections
-- [x] How-to guides
-- [x] Ad placeholder zones
-- [x] Mobile responsive design
-- [x] Toast notifications
+### Frontend (React 19 + Tailwind + Shadcn)
+- [x] Dark theme, mobile responsive
+- [x] HomePage + 5 platform landing pages
+- [x] Hero input, platform grid, FAQ accordion, How-to section
+- [x] DownloadResult component — proxies download through `/api/proxy-download`
+- [x] Toast notifications (sonner)
+- [x] **Dynamic SEO** (`SEO.jsx` + `seoConfig.js`):
+  - Per-page <title>, meta description, canonical, og + twitter tags
+  - JSON-LD: FAQPage, BreadcrumbList, SoftwareApplication, WebSite, HowTo
+  - 6 page configs (home + 5 platforms)
+- [x] **Monetag Multitag** integrated in `index.html` (zone 10618740, `al5sm.com/tag.min.js`)
+- [x] sw.js for Monetag In-Page Push (zone 10574900)
+- [x] **Download History** (localStorage):
+  - `useDownloadHistory` hook — max 20 items, dedupe by URL, cross-tab sync
+  - `DownloadHistory` component — thumbnail, platform badge, relative time, re-download, remove, clear-all
+  - Saved on download click, surfaced on home + all platform pages
+- [x] robots.txt + sitemap.xml + Google site verification
 
 ### API Endpoints
-- `GET /api/health` - Health check
-- `GET /api/platforms` - List supported platforms
-- `POST /api/download` - Main download endpoint
-- `GET /api/stats` - Download statistics
+- `GET  /api/health`
+- `GET  /api/platforms`
+- `POST /api/download`
+- `GET  /api/proxy-download?url=&filename=`
+- `GET  /api/stats`
+
+### Tests
+- Backend pytest suite at `/app/backend/tests/test_saveflex_api.py` (8 tests, 100% pass)
+
+## Changelog
+
+- **Feb 2026 — Initial build**: Backend, frontend, 5 platform pages, RapidAPI + YTStream integrations.
+- **Feb 2026 — Mobile downloads**: `/api/proxy-download` streaming endpoint forces file save on mobile.
+- **Feb 2026 — Monetag ads**: sw.js + (later) Multitag inline script for zone 10618740.
+- **May 27 2026 — SEO JSON-LD**: dynamic `SEO` component + `seoConfig.js`, full structured data on all pages.
+- **May 27 2026 — Download history**: `useDownloadHistory` hook + `DownloadHistory` UI with localStorage persistence.
+- **May 27 2026 — Backend tests**: pytest regression suite added.
 
 ## Prioritized Backlog
 
-### P0 (Critical)
-- [x] Core download functionality - DONE
-- [x] All platform support - DONE
-- [x] Mobile responsive - DONE
+### P1
+- [ ] **i18n multi-language** (EN + IT minimum, add ES/FR/DE/PT for SEO long-tail) — react-i18next
+- [ ] Refactor `server.py` (~840 lines) into `routes/` + `services/` modules per platform
+- [ ] Recover from intermittent RapidAPI "post not found" on Instagram/TikTok (cached fallback or alternative API)
 
-### P1 (High Priority)
-- [ ] Enhanced video metadata (title, author, thumbnail)
-- [ ] Download progress indicator
-- [ ] Copy download link button
+### P2
+- [ ] Download progress indicator on proxy-download (`Content-Length` exposed, hook into XHR/fetch)
+- [ ] Copy download link button on DownloadResult
 - [ ] Social share buttons
+- [ ] Light/Dark mode toggle (currently dark-only)
+- [ ] Batch download support (paste multiple URLs)
 
-### P2 (Medium Priority)
-- [ ] Dark/Light mode toggle
-- [ ] Download history (localStorage)
-- [ ] Batch download support
-- [ ] Audio-only download option
-
-### P3 (Low Priority)
-- [ ] PWA support
+### P3
+- [ ] PWA support (manifest + offline)
 - [ ] Browser extension
-- [ ] API rate limit display
-- [ ] Analytics integration
+- [ ] Analytics integration (Plausible / GA4)
+- [ ] Per-platform sitemaps for video downloader keywords (Snapinsta strategy)
 
-## Next Tasks
-1. Add actual AdSense integration when publisher ID is available
-2. Implement download progress tracking
-3. Add more robust error messages per platform
-4. Set up sitemap.xml for SEO
-5. Add structured data (JSON-LD) for rich snippets
+## Known Issues
+- Instagram/TikTok via RapidAPI occasionally returns "post not found" — third-party flakiness, graceful fallback in place.
+- AdPlaceholder still references unused legacy AdSense code (publisher `ca-pub-5255520995564923`). Inactive (no `adSlot` is ever passed). Can be cleaned up during refactor.
+
+## Test Credentials
+None — app is fully anonymous, no auth.
