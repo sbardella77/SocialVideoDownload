@@ -37,7 +37,13 @@ Build a Snapinsta-like downloader platform with:
 
 ## What's Been Implemented
 
-### Backend (FastAPI)
+### Backend (FastAPI) — modular structure
+- `/app/backend/server.py` (54 lines) — app entry, middleware, router wiring
+- `/app/backend/config.py` — centralised env vars & constants
+- `/app/backend/models.py` — Pydantic models (VideoMetadata, DownloadOption, DownloadResponse, ...)
+- `/app/backend/db.py` — Mongo client + cache helpers (`get_cached_response`, `store_cached_response`)
+- `/app/backend/platforms/{base,youtube,instagram,tiktok,twitter,facebook}.py` — per-platform fetch + parse. Parse functions split into small helpers (≤10 cyclomatic complexity each).
+- `/app/backend/routes/{meta,download}.py` — meta (health/platforms/stats) and download (`/download` + `/proxy-download`) routers. `download_video` uses a `_PLATFORM_HANDLERS` dispatch map.
 - [x] /api/health, /api/platforms, /api/stats
 - [x] POST /api/download — auto-detects platform, returns metadata + download options
 - [x] GET /api/proxy-download — streams remote file with `Content-Disposition: attachment` (forces mobile save)
@@ -83,12 +89,14 @@ Build a Snapinsta-like downloader platform with:
 - **May 27 2026 — Download history**: `useDownloadHistory` hook + `DownloadHistory` UI with localStorage persistence.
 - **May 27 2026 — Backend tests**: pytest regression suite added.
 - **May 27 2026 — Umami Analytics**: privacy-friendly analytics integrated (pageviews + custom `download` event on every download click for conversion tracking).
+- **May 27 2026 — Code quality fixes**: magic numbers → named constants, array-index keys → stable keys, empty catches → dev-only logging, removed dead AdSense code, refactored `DownloadResult.jsx` into small sub-components.
+- **May 27 2026 — Backend refactor (Task F)**: monolithic `server.py` (843 lines) split into `config.py`, `models.py`, `db.py`, `platforms/*.py` (per-platform fetch+parse), `routes/*.py`. Parse functions decomposed into small helpers (cyclomatic complexity ≤10). All 8 pytest still pass.
 
 ## Prioritized Backlog
 
 ### P1
+- [x] ~~Refactor `server.py` (~840 lines) into `routes/` + `services/` modules per platform~~ ✅ Done May 2026
 - [ ] **i18n multi-language** (EN + IT minimum, add ES/FR/DE/PT for SEO long-tail) — react-i18next
-- [ ] Refactor `server.py` (~840 lines) into `routes/` + `services/` modules per platform
 - [ ] Recover from intermittent RapidAPI "post not found" on Instagram/TikTok (cached fallback or alternative API)
 
 ### P2
