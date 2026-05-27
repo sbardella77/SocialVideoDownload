@@ -5,7 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const generalFaqs = [
+export const generalFaqs = [
   {
     question: "Is SaveFlex free to use?",
     answer:
@@ -38,7 +38,7 @@ const generalFaqs = [
   },
 ];
 
-const platformFaqs = {
+export const platformFaqs = {
   youtube: [
     {
       question: "How do I download YouTube videos?",

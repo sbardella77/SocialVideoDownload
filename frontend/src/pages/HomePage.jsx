@@ -7,6 +7,8 @@ import DownloadResult from "@/components/DownloadResult";
 import FAQSection from "@/components/FAQSection";
 import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import SEO from "@/components/SEO";
+import { seoConfig } from "@/components/seoConfig";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -39,6 +41,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen" data-testid="home-page">
+      <SEO {...seoConfig.home} />
       {/* Hero Section */}
       <section className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
         {/* Background */}

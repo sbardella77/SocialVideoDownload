@@ -6,6 +6,8 @@ import DownloadResult from "@/components/DownloadResult";
 import FAQSection from "@/components/FAQSection";
 import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import SEO from "@/components/SEO";
+import { seoConfig } from "@/components/seoConfig";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -43,6 +45,7 @@ export default function YouTubeDownloader() {
 
   return (
     <div className="min-h-screen" data-testid="youtube-page">
+      <SEO {...seoConfig.youtube} />
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 -z-10">
