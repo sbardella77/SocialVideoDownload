@@ -63,9 +63,9 @@ export const HowToSection = ({ platform = "general" }) => {
           Download videos in three simple steps
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((step, index) => (
+          {steps.map((step) => (
             <div
-              key={index}
+              key={step.step}
               className="relative p-6 rounded-2xl bg-secondary/30 border border-border/50"
             >
               <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center text-lg font-bold mb-4">
@@ -87,9 +87,9 @@ export const HowToSection = ({ platform = "general" }) => {
           The best free video downloader for all your needs
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <div
-              key={index}
+              key={feature.title}
               className="p-6 rounded-2xl bg-secondary/30 border border-border/50 hover:border-primary/30 transition-colors duration-300"
             >
               <feature.icon className="w-10 h-10 text-primary mb-4" />

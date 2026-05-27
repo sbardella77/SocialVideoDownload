@@ -4,17 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { History, Trash2, RotateCw, X } from "lucide-react";
 import { useDownloadHistory } from "@/hooks/useDownloadHistory";
 
+// Relative-time thresholds (ms)
+const MS_PER_MINUTE = 60_000;
+const MS_PER_HOUR = 60 * MS_PER_MINUTE;
+const MS_PER_DAY = 24 * MS_PER_HOUR;
+const MS_PER_WEEK = 7 * MS_PER_DAY;
+
 const formatRelativeTime = (iso) => {
   if (!iso) return "";
   const ts = new Date(iso).getTime();
   const diff = Date.now() - ts;
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
+  if (diff < MS_PER_MINUTE) return "just now";
+  if (diff < MS_PER_HOUR) return `${Math.floor(diff / MS_PER_MINUTE)}m ago`;
+  if (diff < MS_PER_DAY) return `${Math.floor(diff / MS_PER_HOUR)}h ago`;
+  if (diff < MS_PER_WEEK) return `${Math.floor(diff / MS_PER_DAY)}d ago`;
   return new Date(iso).toLocaleDateString();
 };
 

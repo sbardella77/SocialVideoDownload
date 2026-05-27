@@ -10,7 +10,10 @@ const readHistory = () => {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
-  } catch {
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Failed to read download history from localStorage:", err);
+    }
     return [];
   }
 };
@@ -18,8 +21,11 @@ const readHistory = () => {
 const writeHistory = (items) => {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {
-    // localStorage might be disabled (private mode, quota). Fail silently.
+  } catch (err) {
+    // localStorage might be disabled (private mode, quota). Surface in dev only.
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Failed to write download history to localStorage:", err);
+    }
   }
 };
 

@@ -132,8 +132,8 @@ export const FAQSection = ({ platform = "general" }) => {
         Frequently Asked Questions
       </h2>
       <Accordion type="single" collapsible className="w-full">
-        {faqs.map((faq, index) => (
-          <AccordionItem key={index} value={`item-${index}`} className="faq-item">
+        {faqs.map((faq) => (
+          <AccordionItem key={faq.question} value={faq.question} className="faq-item">
             <AccordionTrigger className="text-left text-base font-medium py-4 hover:text-primary">
               {faq.question}
             </AccordionTrigger>
