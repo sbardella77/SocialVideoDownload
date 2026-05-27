@@ -39,6 +39,15 @@ export const DownloadResult = ({ result }) => {
       });
     }
 
+    // Track download as Umami custom event for conversion analytics.
+    try {
+      if (typeof window !== "undefined" && window.umami?.track) {
+        window.umami.track("download", { platform, quality, format });
+      }
+    } catch {
+      // Analytics is best-effort; never block download.
+    }
+
     // Check if mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     

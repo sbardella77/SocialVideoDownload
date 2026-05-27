@@ -16,6 +16,7 @@ Build a Snapinsta-like downloader platform with:
 - **Database**: MongoDB (caching + stats)
 - **APIs**: RapidAPI Social Media Video Downloader (Instagram/TikTok/X/Facebook) + YTStream (YouTube)
 - **Ads**: Monetag Multitag (zone 10618740) + In-Page Push via sw.js
+- **Analytics**: Umami Cloud (privacy-friendly, no cookie banner, website-id `04cf1563-a434-46fa-9f41-fec01d259f89`) + custom `download` event
 - **SEO**: Dynamic JSON-LD (FAQPage, BreadcrumbList, SoftwareApplication, WebSite, HowTo)
 
 ### Key Design Decisions
@@ -81,6 +82,7 @@ Build a Snapinsta-like downloader platform with:
 - **May 27 2026 — SEO JSON-LD**: dynamic `SEO` component + `seoConfig.js`, full structured data on all pages.
 - **May 27 2026 — Download history**: `useDownloadHistory` hook + `DownloadHistory` UI with localStorage persistence.
 - **May 27 2026 — Backend tests**: pytest regression suite added.
+- **May 27 2026 — Umami Analytics**: privacy-friendly analytics integrated (pageviews + custom `download` event on every download click for conversion tracking).
 
 ## Prioritized Backlog
 
