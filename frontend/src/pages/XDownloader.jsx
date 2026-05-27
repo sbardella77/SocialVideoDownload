@@ -6,6 +6,7 @@ import DownloadResult from "@/components/DownloadResult";
 import FAQSection from "@/components/FAQSection";
 import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import DownloadHistory from "@/components/DownloadHistory";
 import SEO from "@/components/SEO";
 import { seoConfig } from "@/components/seoConfig";
 
@@ -27,7 +28,7 @@ export default function XDownloader() {
     try {
       const response = await axios.post(`${API_URL}/api/download`, { url });
       if (response.data.success && response.data.download_options?.length > 0) {
-        setResult(response.data);
+        setResult({ ...response.data, source_url: url });
         toast.success("Content found! Choose your download option.");
       } else {
         const errorMsg = response.data.error || response.data.message || "No download options available for this content.";
@@ -85,6 +86,10 @@ export default function XDownloader() {
               <DownloadResult result={result} />
             </div>
           )}
+
+          <div className="mt-12">
+            <DownloadHistory onReDownload={handleDownload} />
+          </div>
         </div>
       </section>
 

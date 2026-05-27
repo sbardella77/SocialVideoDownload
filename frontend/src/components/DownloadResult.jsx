@@ -3,13 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, CheckCircle, Image, Film, Smartphone } from "lucide-react";
 import { toast } from "sonner";
+import { useDownloadHistory } from "@/hooks/useDownloadHistory";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export const DownloadResult = ({ result }) => {
+  const { addItem } = useDownloadHistory();
+
   if (!result || !result.success) return null;
 
-  const { metadata, download_options, platform } = result;
+  const { metadata, download_options, platform, source_url } = result;
 
   // Generate safe filename from title
   const generateFilename = (title, format) => {
@@ -24,7 +27,18 @@ export const DownloadResult = ({ result }) => {
   // Use proxy download for mobile compatibility
   const handleDownload = (url, quality, format) => {
     const filename = generateFilename(metadata?.title, format);
-    
+
+    // Persist to history (only when user actually triggers a download).
+    if (source_url) {
+      addItem({
+        url: source_url,
+        platform,
+        title: metadata?.title,
+        thumbnail: metadata?.thumbnail_url,
+        author: metadata?.author,
+      });
+    }
+
     // Check if mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     

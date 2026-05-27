@@ -7,6 +7,7 @@ import DownloadResult from "@/components/DownloadResult";
 import FAQSection from "@/components/FAQSection";
 import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import DownloadHistory from "@/components/DownloadHistory";
 import SEO from "@/components/SEO";
 import { seoConfig } from "@/components/seoConfig";
 
@@ -23,7 +24,7 @@ export default function HomePage() {
     try {
       const response = await axios.post(`${API_URL}/api/download`, { url });
       if (response.data.success && response.data.download_options?.length > 0) {
-        setResult(response.data);
+        setResult({ ...response.data, source_url: url });
         toast.success("Video found! Choose your download option.");
       } else {
         const errorMsg = response.data.error || response.data.message || "No download options available for this video.";
@@ -79,6 +80,11 @@ export default function HomePage() {
               <DownloadResult result={result} />
             </div>
           )}
+
+          {/* Download History */}
+          <div className="mt-12">
+            <DownloadHistory onReDownload={handleDownload} />
+          </div>
 
           {/* Supported Platforms Badge */}
           <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm text-muted-foreground">
