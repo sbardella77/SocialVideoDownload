@@ -58,17 +58,33 @@ def parse_facebook_response(data: Dict[str, Any]) -> DownloadResponse:
 
     metadata = _build_metadata(data.get("metadata", {}))
 
-    options: List[DownloadOption] = []
+    # Track whether the API reported video-only (DASH separated) streams that
+    # we had to filter out. If everything is video-only, give the user a clear
+    # message instead of letting them download a silent file.
+    all_videos: List[DownloadOption] = []
+    video_only_seen = False
     for content in data.get("contents", []) or []:
-        options.extend(parse_video_list(content))
+        for video in content.get("videos", []) or []:
+            meta = video.get("metadata") or {}
+            if meta.get("has_audio") is False:
+                video_only_seen = True
+        all_videos.extend(parse_video_list(content, require_audio=True))
 
-    if not options:
-        options = _legacy_options(data)
+    if not all_videos:
+        all_videos = _legacy_options(data)
+
+    if not all_videos and video_only_seen:
+        return error_response(
+            PLATFORM,
+            "This Facebook video only has separated audio/video streams (DASH). "
+            "Try a different video (e.g. a regular Watch post) or download from "
+            "facebook.com directly.",
+        )
 
     return DownloadResponse(
         success=True,
         message="Video found successfully",
         platform=PLATFORM,
         metadata=metadata,
-        download_options=options,
+        download_options=all_videos,
     )

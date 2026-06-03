@@ -91,6 +91,7 @@ Build a Snapinsta-like downloader platform with:
 - **May 27 2026 — Umami Analytics**: privacy-friendly analytics integrated (pageviews + custom `download` event on every download click for conversion tracking).
 - **May 27 2026 — Code quality fixes**: magic numbers → named constants, array-index keys → stable keys, empty catches → dev-only logging, removed dead AdSense code, refactored `DownloadResult.jsx` into small sub-components.
 - **May 27 2026 — Backend refactor (Task F)**: monolithic `server.py` (843 lines) split into `config.py`, `models.py`, `db.py`, `platforms/*.py` (per-platform fetch+parse), `routes/*.py`. Parse functions decomposed into small helpers (cyclomatic complexity ≤10). All 8 pytest still pass.
+- **May 27 2026 — Bug fix Facebook audio**: video Facebook scaricati senza audio. Root cause duplice: (1) i Reels e alcuni video lunghi usano stream DASH separati video+audio — il nostro parser includeva URL video-only (`has_audio: false`) come opzioni scaricabili; (2) il proxy non passava User-Agent realistici, e Facebook CDN occasionalmente serve file stripped a client "bot-like". Fix: `parse_video_list(require_audio=True)` filtra stream senza audio, errore esplicito quando tutti gli stream sono video-only DASH, label normalizzate (`native_hd` → `HD`), proxy ora invia User-Agent Safari + Accept headers. +4 unit test su `tests/test_platform_parsers.py`.
 
 ## Prioritized Backlog
 

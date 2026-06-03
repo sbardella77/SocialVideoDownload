@@ -114,9 +114,21 @@ def _sanitize_filename(filename: str) -> str:
     return safe
 
 
+_BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 "
+        "(KHTML, like Gecko) Version/17.0 Safari/605.1.15"
+    ),
+    "Accept": "*/*",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+
 async def _stream_remote(url: str) -> AsyncIterator[bytes]:
     async with httpx.AsyncClient(
-        timeout=PROXY_STREAM_TIMEOUT_SECONDS, follow_redirects=True
+        timeout=PROXY_STREAM_TIMEOUT_SECONDS,
+        follow_redirects=True,
+        headers=_BROWSER_HEADERS,
     ) as client:
         async with client.stream("GET", url) as response:
             response.raise_for_status()
@@ -128,7 +140,9 @@ async def _head_info(url: str) -> dict:
     """Best-effort metadata via HEAD; returns defaults on failure."""
     try:
         async with httpx.AsyncClient(
-            timeout=API_TIMEOUT_SECONDS, follow_redirects=True
+            timeout=API_TIMEOUT_SECONDS,
+            follow_redirects=True,
+            headers=_BROWSER_HEADERS,
         ) as client:
             head = await client.head(url)
         return {

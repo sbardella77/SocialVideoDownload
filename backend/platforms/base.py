@@ -48,18 +48,35 @@ def error_response(platform: str, message: str) -> DownloadResponse:
     )
 
 
-def parse_video_list(content: Dict[str, Any]) -> List[DownloadOption]:
-    """Parse `content.videos[]` array into DownloadOption list."""
+def parse_video_list(
+    content: Dict[str, Any], *, require_audio: bool = False
+) -> List[DownloadOption]:
+    """Parse `content.videos[]` array into DownloadOption list.
+
+    When `require_audio=True`, skip entries whose RapidAPI metadata explicitly
+    reports `has_audio: False` (these are video-only streams from DASH).
+    """
     out: List[DownloadOption] = []
     for video in content.get("videos", []) or []:
         if not video.get("url"):
             continue
+        meta = video.get("metadata") or {}
+        if require_audio and meta.get("has_audio") is False:
+            continue
+        label = video.get("label", "Original")
+        # Normalise Facebook labels to a user-friendly quality string.
+        quality = {
+            "native_hd": "HD",
+            "native_sd": "SD",
+            "hd": "HD",
+            "sd": "SD",
+        }.get(label, label)
         out.append(
             DownloadOption(
-                quality=video.get("label", "Original"),
+                quality=quality,
                 format="video/mp4",
                 url=video["url"],
-                size=(video.get("metadata") or {}).get("content_length_text"),
+                size=meta.get("content_length_text"),
             )
         )
     return out
