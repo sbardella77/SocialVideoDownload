@@ -7,19 +7,22 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from config import MONGO_URL, DB_NAME, CACHE_TTL_SECONDS
 
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=3000)
 db = client[DB_NAME]
 
 
 async def get_cached_response(url: str) -> Optional[Dict[str, Any]]:
     """Return the cached response_data dict or None if missing/expired."""
-    doc = await db.download_cache.find_one(
-        {
-            "url": url,
-            "expires_at": {"$gt": datetime.now(timezone.utc).isoformat()},
-        },
-        {"_id": 0},
-    )
+    try:
+        doc = await db.download_cache.find_one(
+            {
+                "url": url,
+                "expires_at": {"$gt": datetime.now(timezone.utc).isoformat()},
+            },
+            {"_id": 0},
+        )
+    except Exception:
+        return None
     if not doc:
         return None
     return doc.get("response_data")
@@ -35,7 +38,10 @@ async def store_cached_response(url: str, platform: str, response_data: Dict[str
         "created_at": now.isoformat(),
         "expires_at": (now + timedelta(seconds=CACHE_TTL_SECONDS)).isoformat(),
     }
-    await db.download_cache.insert_one(cache_doc)
+    try:
+        await db.download_cache.insert_one(cache_doc)
+    except Exception:
+        pass
 
 
 def close_client() -> None:
