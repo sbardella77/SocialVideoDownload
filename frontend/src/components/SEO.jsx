@@ -1,7 +1,5 @@
 import { useEffect } from "react";
-
-const SITE_URL = "https://saveflex.net";
-const DEFAULT_OG_IMAGE = "https://saveflex.net/og-image.png";
+import { SITE_URL, OG_IMAGE, pages, buildJsonLd } from "@/seo/siteData.mjs";
 
 /**
  * Updates (or creates) a <meta> tag by name or property.
@@ -21,8 +19,11 @@ const setMetaTag = (attr, key, content) => {
  * Updates (or creates) the canonical <link> tag.
  */
 const setCanonical = (href) => {
-  if (!href) return;
   let el = document.head.querySelector('link[rel="canonical"]');
+  if (!href) {
+    if (el) el.remove();
+    return;
+  }
   if (!el) {
     el = document.createElement("link");
     el.setAttribute("rel", "canonical");
@@ -45,86 +46,40 @@ const setJsonLd = (id, data) => {
   el.text = JSON.stringify(data);
 };
 
-/**
- * Remove a JSON-LD script (used on unmount to keep the head clean).
- */
 const removeJsonLd = (id) => {
   const el = document.getElementById(id);
   if (el) el.remove();
 };
 
-export const SEO = ({
-  title,
-  description,
-  path = "/",
-  ogImage = DEFAULT_OG_IMAGE,
-  faqs = [],
-  breadcrumbs = [],
-  schemas = [],
-}) => {
+/**
+ * Keeps <head> in sync with the current route during client-side
+ * navigation. The first paint already has the same tags, written into
+ * each route's HTML at build time by scripts/prerender.mjs.
+ */
+export const SEO = ({ page: key, noindex = false, title: customTitle }) => {
   useEffect(() => {
-    const url = `${SITE_URL}${path}`;
+    const page = pages[key];
+    const title = page ? page.title : customTitle;
+    const url = page ? `${SITE_URL}${page.path}` : null;
 
-    // Title + meta
     if (title) document.title = title;
-    setMetaTag("name", "description", description);
-    setMetaTag("property", "og:title", title);
-    setMetaTag("property", "og:description", description);
-    setMetaTag("property", "og:url", url);
-    setMetaTag("property", "og:type", "website");
-    setMetaTag("property", "og:image", ogImage);
-    setMetaTag("name", "twitter:card", "summary_large_image");
-    setMetaTag("name", "twitter:title", title);
-    setMetaTag("name", "twitter:description", description);
-    setMetaTag("name", "twitter:image", ogImage);
+    setMetaTag("name", "robots", noindex ? "noindex, follow" : "index, follow, max-image-preview:large");
     setCanonical(url);
+    if (!page) return undefined;
 
-    // JSON-LD: FAQ
-    const injectedIds = [];
-    if (faqs && faqs.length > 0) {
-      const faqLd = {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: faqs.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: f.answer,
-          },
-        })),
-      };
-      setJsonLd("jsonld-faq", faqLd);
-      injectedIds.push("jsonld-faq");
-    }
+    setMetaTag("name", "description", page.description);
+    setMetaTag("property", "og:title", page.title);
+    setMetaTag("property", "og:description", page.description);
+    setMetaTag("property", "og:url", url);
+    setMetaTag("property", "og:image", OG_IMAGE);
+    setMetaTag("name", "twitter:title", page.title);
+    setMetaTag("name", "twitter:description", page.description);
+    setMetaTag("name", "twitter:image", OG_IMAGE);
 
-    // JSON-LD: Breadcrumbs
-    if (breadcrumbs && breadcrumbs.length > 0) {
-      const breadcrumbLd = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: breadcrumbs.map((b, i) => ({
-          "@type": "ListItem",
-          position: i + 1,
-          name: b.name,
-          item: `${SITE_URL}${b.path}`,
-        })),
-      };
-      setJsonLd("jsonld-breadcrumb", breadcrumbLd);
-      injectedIds.push("jsonld-breadcrumb");
-    }
-
-    // JSON-LD: custom schemas (SoftwareApplication, WebPage, etc.)
-    (schemas || []).forEach((schema, i) => {
-      const id = `jsonld-extra-${i}`;
-      setJsonLd(id, schema);
-      injectedIds.push(id);
-    });
-
-    return () => {
-      injectedIds.forEach(removeJsonLd);
-    };
-  }, [title, description, path, ogImage, faqs, breadcrumbs, schemas]);
+    const blocks = buildJsonLd(key);
+    blocks.forEach(({ id, data }) => setJsonLd(id, data));
+    return () => blocks.forEach(({ id }) => removeJsonLd(id));
+  }, [key, noindex, customTitle]);
 
   return null;
 };

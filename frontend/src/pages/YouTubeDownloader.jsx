@@ -8,7 +8,7 @@ import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import DownloadHistory from "@/components/DownloadHistory";
 import SEO from "@/components/SEO";
-import { seoConfig } from "@/components/seoConfig";
+import AboutSection from "@/components/AboutSection";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -46,7 +46,7 @@ export default function YouTubeDownloader() {
 
   return (
     <div className="min-h-screen" data-testid="youtube-page">
-      <SEO {...seoConfig.youtube} />
+      <SEO page="youtube" />
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 -z-10">
@@ -62,11 +62,9 @@ export default function YouTubeDownloader() {
               </svg>
               YouTube Downloader
             </div>
-            <p className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-foreground">
-              Download YouTube Videos
-            </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              <span className="text-red-400">in HD Quality</span>
+            <h1 className="font-bold tracking-tight mb-6">
+              <span className="block text-2xl sm:text-3xl mb-2 text-foreground">Download YouTube Videos</span>{" "}
+              <span className="block text-4xl sm:text-5xl md:text-6xl text-red-400">in HD Quality</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Save YouTube videos, shorts, and music in multiple quality options. Free, fast, and no software needed.
@@ -126,22 +124,7 @@ export default function YouTubeDownloader() {
       {/* SEO Content */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              Free YouTube Video Downloader Online
-            </h2>
-            <div className="prose prose-invert prose-lg max-w-none text-muted-foreground">
-              <p className="mb-4">
-                SaveFlex provides the easiest way to download YouTube videos online. Support for all video formats including MP4, with quality options from 360p to 4K when available.
-              </p>
-              <p className="mb-4">
-                Our YouTube downloader works with regular videos, YouTube Shorts, and live stream recordings. Simply paste the video URL and choose your preferred quality to start downloading.
-              </p>
-              <p>
-                Perfect for saving tutorials, music videos, documentaries, or any YouTube content for offline viewing. No registration or software installation required.
-              </p>
-            </div>
-          </div>
+          <AboutSection page="youtube" />
         </div>
       </section>
     </div>

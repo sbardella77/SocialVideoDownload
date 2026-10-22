@@ -1,0 +1,23 @@
+# SaveFlex
+
+> SaveFlex (saveflex.net) is a free, web-based video downloader. Paste a public link from YouTube, TikTok, Instagram, Facebook or X (Twitter) and download the video as MP4. No account, no app and no software install are needed, and it works in any modern browser on iPhone, Android, Windows, macOS and Linux.
+
+Key facts:
+
+- Price: free, supported by ads.
+- Account: not required.
+- Supported sites: YouTube (videos, Shorts), TikTok (watermark removed when possible), Instagram (Reels, posts, Stories from public accounts), Facebook (videos and Reels from public posts), X / Twitter (videos and GIFs, x.com and twitter.com links).
+- Output: MP4 video in the qualities the source provides, from 360p up to 1080p and 4K when available.
+- Limits: public content only; private, deleted or region-restricted posts cannot be downloaded; one video per link (no playlists); about 30 requests per minute.
+- Intended for personal use. Users are responsible for respecting copyright and each platform's terms.
+
+How it works: copy the video link, paste it into SaveFlex, choose a quality, download.
+
+## Downloaders
+
+- [Free video downloader (all platforms)](https://saveflex.net/): one box for YouTube, TikTok, Instagram, Facebook and X links
+- [YouTube Downloader](https://saveflex.net/youtube-downloader): YouTube videos and Shorts as MP4 in HD, Full HD or 4K when available
+- [TikTok Downloader](https://saveflex.net/tiktok-downloader): TikTok videos without watermark in HD MP4
+- [Instagram Downloader](https://saveflex.net/instagram-downloader): Instagram Reels, video posts and Stories from public accounts
+- [Facebook Downloader](https://saveflex.net/facebook-downloader): Facebook videos and Reels in HD or SD
+- [X (Twitter) Downloader](https://saveflex.net/x-downloader): videos and GIFs from X posts, x.com and twitter.com links

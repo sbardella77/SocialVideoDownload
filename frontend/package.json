@@ -21,6 +21,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
+    "postbuild": "node scripts/prerender.mjs",
     "test": "craco test"
   },
   "browserslist": {
