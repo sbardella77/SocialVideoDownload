@@ -8,7 +8,7 @@ import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import DownloadHistory from "@/components/DownloadHistory";
 import SEO from "@/components/SEO";
-import { seoConfig } from "@/components/seoConfig";
+import AboutSection from "@/components/AboutSection";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -46,7 +46,7 @@ export default function FacebookDownloader() {
 
   return (
     <div className="min-h-screen" data-testid="facebook-page">
-      <SEO {...seoConfig.facebook} />
+      <SEO page="facebook" />
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 -z-10">
@@ -62,11 +62,9 @@ export default function FacebookDownloader() {
               </svg>
               Facebook Downloader
             </div>
-            <p className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-foreground">
-              Download Facebook
-            </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              <span className="text-blue-500">Videos & Reels</span>
+            <h1 className="font-bold tracking-tight mb-6">
+              <span className="block text-2xl sm:text-3xl mb-2 text-foreground">Download Facebook</span>{" "}
+              <span className="block text-4xl sm:text-5xl md:text-6xl text-blue-500">Videos & Reels</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Save Facebook videos and Reels in HD and SD quality. Free, fast, and no Facebook login required.
@@ -126,22 +124,7 @@ export default function FacebookDownloader() {
       {/* SEO Content */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              Free Facebook Video Downloader Online
-            </h2>
-            <div className="prose prose-invert prose-lg max-w-none text-muted-foreground">
-              <p className="mb-4">
-                SaveFlex lets you download Facebook videos and Reels with ease. Save videos from public Facebook posts, pages, and groups in HD or SD quality.
-              </p>
-              <p className="mb-4">
-                Our Facebook video downloader works with all public video content. Simply copy the video URL from Facebook, paste it above, and choose your preferred quality to download.
-              </p>
-              <p>
-                Perfect for saving memorable videos, funny clips, news content, or any public Facebook video for offline viewing.
-              </p>
-            </div>
-          </div>
+          <AboutSection page="facebook" />
         </div>
       </section>
     </div>

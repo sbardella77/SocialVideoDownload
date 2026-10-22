@@ -2,14 +2,8 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { Download, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { navLinks } from "@/seo/siteData.mjs";
 
-const navLinks = [
-  { href: "/instagram-downloader", label: "Instagram" },
-  { href: "/tiktok-downloader", label: "TikTok" },
-  { href: "/youtube-downloader", label: "YouTube" },
-  { href: "/x-downloader", label: "X" },
-  { href: "/facebook-downloader", label: "Facebook" },
-];
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -8,7 +8,7 @@ import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import DownloadHistory from "@/components/DownloadHistory";
 import SEO from "@/components/SEO";
-import { seoConfig } from "@/components/seoConfig";
+import AboutSection from "@/components/AboutSection";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -46,7 +46,7 @@ export default function XDownloader() {
 
   return (
     <div className="min-h-screen" data-testid="x-page">
-      <SEO {...seoConfig.x} />
+      <SEO page="x" />
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 -z-10">
@@ -62,11 +62,9 @@ export default function XDownloader() {
               </svg>
               X Downloader
             </div>
-            <p className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-foreground">
-              Download X
-            </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              <span className="text-zinc-300">Videos & GIFs</span>
+            <h1 className="font-bold tracking-tight mb-6">
+              <span className="block text-2xl sm:text-3xl mb-2 text-foreground">Download X</span>{" "}
+              <span className="block text-4xl sm:text-5xl md:text-6xl text-zinc-300">Videos & GIFs</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Save videos and GIFs from X in high quality. Fast, free, and works with any public post.
@@ -126,22 +124,7 @@ export default function XDownloader() {
       {/* SEO Content */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              Best X Video Downloader Online
-            </h2>
-            <div className="prose prose-invert prose-lg max-w-none text-muted-foreground">
-              <p className="mb-4">
-                SaveFlex makes it easy to download videos and GIFs from X (formerly Twitter). Save viral videos, news clips, sports highlights, and more from any public post.
-              </p>
-              <p className="mb-4">
-                Our X video downloader supports multiple quality options when available, letting you choose between different bitrates for the best balance of quality and file size.
-              </p>
-              <p>
-                Works with both x.com and twitter.com URLs. Just paste the post link containing the video or GIF you want to save and download instantly.
-              </p>
-            </div>
-          </div>
+          <AboutSection page="x" />
         </div>
       </section>
     </div>

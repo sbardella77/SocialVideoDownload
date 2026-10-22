@@ -1,4 +1,5 @@
 import { Zap, Shield, Smartphone, Globe } from "lucide-react";
+import { howToSteps } from "@/seo/siteData.mjs";
 
 const features = [
   {
@@ -33,24 +34,7 @@ export const HowToSection = ({ platform = "general" }) => {
     facebook: "Facebook",
     general: "social media",
   };
-
-  const steps = [
-    {
-      step: "1",
-      title: "Copy the Link",
-      description: `Open ${platformNames[platform]} and copy the video URL from your browser or the share button.`,
-    },
-    {
-      step: "2",
-      title: "Paste the URL",
-      description: "Paste the copied link into the input field above and click the Download button.",
-    },
-    {
-      step: "3",
-      title: "Choose Quality",
-      description: "Select your preferred quality from the available options and start downloading.",
-    },
-  ];
+  const steps = howToSteps(platform);
 
   return (
     <section className="w-full" data-testid="how-to-section">

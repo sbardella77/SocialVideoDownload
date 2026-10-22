@@ -8,6 +8,7 @@ import TikTokDownloader from "@/pages/TikTokDownloader";
 import YouTubeDownloader from "@/pages/YouTubeDownloader";
 import XDownloader from "@/pages/XDownloader";
 import FacebookDownloader from "@/pages/FacebookDownloader";
+import NotFound from "@/pages/NotFound";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/youtube-downloader" element={<YouTubeDownloader />} />
             <Route path="/x-downloader" element={<XDownloader />} />
             <Route path="/facebook-downloader" element={<FacebookDownloader />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </BrowserRouter>

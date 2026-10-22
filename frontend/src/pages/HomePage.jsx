@@ -9,7 +9,7 @@ import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import DownloadHistory from "@/components/DownloadHistory";
 import SEO from "@/components/SEO";
-import { seoConfig } from "@/components/seoConfig";
+import AboutSection from "@/components/AboutSection";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -42,7 +42,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen" data-testid="home-page">
-      <SEO {...seoConfig.home} />
+      <SEO page="home" />
       {/* Hero Section */}
       <section className="relative isolate pt-16 pb-20 sm:pt-24 md:pt-28 md:pb-28 overflow-hidden">
         {/* Background */}
@@ -134,22 +134,7 @@ export default function HomePage() {
       {/* SEO Content Section */}
       <section className="py-16 md:py-24 bg-secondary/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              The Best Free Video Downloader Online
-            </h2>
-            <div className="prose prose-invert prose-lg max-w-none text-muted-foreground">
-              <p className="mb-4">
-                SaveFlex is your go-to solution for downloading videos from social media platforms. Whether you want to save a YouTube tutorial, download an Instagram Reel, grab a viral TikTok, save a Twitter video, or download Facebook content - we've got you covered.
-              </p>
-              <p className="mb-4">
-                Our service is completely free, requires no registration, and works on any device. We prioritize your privacy by not storing any personal data or download history. Simply paste your link, choose your quality, and download.
-              </p>
-              <p>
-                SaveFlex supports multiple quality options including HD and Full HD downloads when available. For TikTok videos, we even offer watermark-free downloads for a cleaner viewing experience.
-              </p>
-            </div>
-          </div>
+          <AboutSection page="home" />
         </div>
       </section>
     </div>

@@ -8,7 +8,7 @@ import HowToSection from "@/components/HowToSection";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import DownloadHistory from "@/components/DownloadHistory";
 import SEO from "@/components/SEO";
-import { seoConfig } from "@/components/seoConfig";
+import AboutSection from "@/components/AboutSection";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -46,7 +46,7 @@ export default function InstagramDownloader() {
 
   return (
     <div className="min-h-screen" data-testid="instagram-page">
-      <SEO {...seoConfig.instagram} />
+      <SEO page="instagram" />
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 -z-10">
@@ -62,11 +62,9 @@ export default function InstagramDownloader() {
               </svg>
               Instagram Downloader
             </div>
-            <p className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-foreground">
-              Download Instagram
-            </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              <span className="text-pink-400">Reels & Videos</span>
+            <h1 className="font-bold tracking-tight mb-6">
+              <span className="block text-2xl sm:text-3xl mb-2 text-foreground">Download Instagram</span>{" "}
+              <span className="block text-4xl sm:text-5xl md:text-6xl text-pink-400">Reels & Videos</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Save Instagram Reels, posts, stories, and IGTV videos in high quality. Free, fast, and no login required.
@@ -126,22 +124,7 @@ export default function InstagramDownloader() {
       {/* SEO Content */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              Best Free Instagram Video Downloader
-            </h2>
-            <div className="prose prose-invert prose-lg max-w-none text-muted-foreground">
-              <p className="mb-4">
-                SaveFlex's Instagram Downloader lets you save Instagram content with ease. Download Instagram Reels, regular video posts, IGTV videos, and carousel posts in their original quality.
-              </p>
-              <p className="mb-4">
-                Our tool supports all types of Instagram content from public accounts. Simply copy the Instagram URL, paste it above, and download your content in seconds. No app installation or login required.
-              </p>
-              <p>
-                Whether you're saving travel inspiration, workout videos, cooking tutorials, or memorable moments shared by friends and creators, SaveFlex makes it simple and free.
-              </p>
-            </div>
-          </div>
+          <AboutSection page="instagram" />
         </div>
       </section>
     </div>
