@@ -44,35 +44,33 @@ export default function HomePage() {
     <div className="min-h-screen" data-testid="home-page">
       <SEO {...seoConfig.home} />
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
+      <section className="relative isolate pt-16 pb-20 sm:pt-24 md:pt-28 md:pb-28 overflow-hidden">
         {/* Background */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-          <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
-        </div>
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[720px] hero-grid" aria-hidden="true" />
+        <div className="pointer-events-none absolute left-1/2 top-40 -z-10 h-[420px] w-[min(980px,140%)] -translate-x-1/2 hero-aurora" aria-hidden="true" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2 text-foreground">
-              Download Videos from
+          <div className="text-center mb-10 max-w-4xl mx-auto">
+            <p className="hero-rise inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_theme(colors.emerald.400)]" />
+              Free · No signup required
             </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 leading-tight">
-              <span className="gradient-text">Any Platform</span>
+            <h1 className="hero-rise mt-6 text-[40px] sm:text-6xl md:text-[76px] font-extrabold leading-[1.02] tracking-[-0.035em] text-balance" style={{ animationDelay: "0.05s" }}>
+              Every video you love,<br className="hidden sm:block" />{" "}
+              <span className="gradient-text">saved in one click.</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              The fastest, free video downloader for YouTube, Instagram, TikTok, X, and Facebook. No signup required.
+            <p className="hero-rise mt-5 text-base sm:text-lg leading-relaxed text-muted-foreground max-w-[36rem] mx-auto" style={{ animationDelay: "0.1s" }}>
+              The free video downloader for YouTube, TikTok, Instagram, Facebook and X. Paste a link and SaveFlex gets it ready to download in high quality.
             </p>
           </div>
 
           {/* Main Input */}
-          <div className="mb-8">
-            <HeroInput
-              onSubmit={handleDownload}
-              loading={loading}
-              placeholder="Paste video URL from YouTube, Instagram, TikTok, Twitter, or Facebook..."
-            />
-          </div>
+          <HeroInput
+            onSubmit={handleDownload}
+            loading={loading}
+            placeholder="Paste your video link here..."
+            showPlatforms
+          />
 
           {/* Result */}
           {result && (
@@ -84,16 +82,6 @@ export default function HomePage() {
           {/* Download History */}
           <div className="mt-12">
             <DownloadHistory onReDownload={handleDownload} />
-          </div>
-
-          {/* Supported Platforms Badge */}
-          <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm text-muted-foreground">
-            <span>Supported:</span>
-            <span className="text-foreground font-medium">YouTube</span>
-            <span className="text-foreground font-medium">Instagram</span>
-            <span className="text-foreground font-medium">TikTok</span>
-            <span className="text-foreground font-medium">X</span>
-            <span className="text-foreground font-medium">Facebook</span>
           </div>
         </div>
       </section>

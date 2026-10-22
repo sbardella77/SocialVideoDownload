@@ -16,14 +16,14 @@ export const Header = () => {
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2 group" data-testid="logo-link">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-              <Download className="w-5 h-5 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-[10px] brand-gradient flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+              <Download className="w-4 h-4 text-white" strokeWidth={2.6} />
             </div>
-            <span className="text-xl font-bold tracking-tight">SaveFlex</span>
+            <span className="font-display text-[19px] font-bold tracking-tight">Save<span className="gradient-text">Flex</span></span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -91,10 +91,10 @@ export const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Download className="w-4 h-4 text-primary-foreground" />
+              <div className="w-8 h-8 rounded-[10px] brand-gradient flex items-center justify-center">
+                <Download className="w-4 h-4 text-white" strokeWidth={2.6} />
               </div>
-              <span className="text-lg font-bold">SaveFlex</span>
+              <span className="font-display text-lg font-bold">Save<span className="gradient-text">Flex</span></span>
             </Link>
             <p className="text-sm text-muted-foreground">
               The fastest way to download videos from your favorite social platforms.
@@ -172,7 +172,7 @@ export const Footer = () => {
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col bg-background noise">
+    <div className="min-h-screen flex flex-col bg-background text-foreground noise">
       <Header />
       <main className="flex-1">
         <Outlet />
