@@ -1,4 +1,4 @@
-app = "saveflex-api"
+app = "socialvideodownload"
 primary_region = "fra"
 
 [build]
