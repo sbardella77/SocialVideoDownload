@@ -1,11 +1,13 @@
 import { useState, useCallback } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Loader2, Clipboard, ArrowRight, X } from "lucide-react";
+import { Loader2, Clipboard, Download, Link2, X } from "lucide-react";
 import { toast } from "sonner";
+import { detectPlatform, PlatformChips } from "@/components/PlatformIcons";
 
-export const HeroInput = ({ onSubmit, loading, placeholder }) => {
+const DEFAULT_HINT = "Works with public links. Paste one to get started.";
+
+export const HeroInput = ({ onSubmit, loading, placeholder, showPlatforms = false }) => {
   const [url, setUrl] = useState("");
+  const platform = detectPlatform(url);
 
   const handlePaste = useCallback(async () => {
     try {
@@ -30,66 +32,81 @@ export const HeroInput = ({ onSubmit, loading, placeholder }) => {
     onSubmit(url.trim());
   };
 
+  let hint = DEFAULT_HINT;
+  if (url.trim()) {
+    hint = platform
+      ? `${platform.name} link detected.`
+      : "We don't recognize this link. Check that it's from a supported platform.";
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto" data-testid="hero-input-form">
-      <div className="relative flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder={placeholder || "Paste your video link here..."}
-            disabled={loading}
-            className="hero-input w-full pr-20"
-            data-testid="url-input"
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+    <div className="w-full">
+      <form onSubmit={handleSubmit} className="hero-rise w-full max-w-2xl mx-auto" style={{ animationDelay: "0.15s" }} data-testid="hero-input-form">
+        <label htmlFor="video-url" className="sr-only">Video link</label>
+        <div className="hero-field flex flex-col gap-2 rounded-[28px] p-2 sm:flex-row sm:items-center sm:rounded-full">
+          <div className="flex min-w-0 flex-1 items-center gap-2 pl-4 pr-1">
+            <Link2 className="w-5 h-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <input
+              id="video-url"
+              type="url"
+              inputMode="url"
+              autoComplete="off"
+              spellCheck={false}
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder={placeholder || "Paste your video link here..."}
+              disabled={loading}
+              className="h-12 sm:h-14 min-w-0 flex-1 bg-transparent px-1 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-60"
+              data-testid="url-input"
+            />
             {url && (
-              <Button
+              <button
                 type="button"
-                variant="ghost"
-                size="icon"
                 onClick={handleClear}
                 disabled={loading}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Clear link"
                 data-testid="clear-btn"
               >
                 <X className="w-4 h-4" />
-              </Button>
+              </button>
             )}
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="icon"
               onClick={handlePaste}
               disabled={loading}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+              aria-label="Paste from clipboard"
               data-testid="paste-btn"
             >
               <Clipboard className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="hero-cta brand-gradient inline-flex h-12 sm:h-14 shrink-0 items-center justify-center gap-2 rounded-full px-7 sm:px-9 font-display text-base font-semibold text-white disabled:opacity-80"
+            data-testid="download-btn"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Processing...</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-[18px] h-[18px]" strokeWidth={2.4} />
+                <span>Download</span>
+              </>
+            )}
+          </button>
         </div>
-        <Button
-          type="submit"
-          disabled={loading}
-          className="h-12 sm:h-14 md:h-16 px-6 sm:px-8 rounded-full text-base font-semibold gap-2 bg-primary hover:bg-primary/90"
-          data-testid="download-btn"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="hidden sm:inline">Processing...</span>
-            </>
-          ) : (
-            <>
-              <span>Download</span>
-              <ArrowRight className="w-5 h-5" />
-            </>
-          )}
-        </Button>
-      </div>
-    </form>
+        <p className="mt-3 min-h-[20px] text-center text-[13px] text-muted-foreground" aria-live="polite" data-testid="url-hint">
+          {hint}
+        </p>
+      </form>
+      {showPlatforms && <PlatformChips activeId={platform?.id} />}
+    </div>
   );
 };
 
