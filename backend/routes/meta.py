@@ -63,10 +63,15 @@ async def get_platforms():
 
 @router.get("/stats")
 async def get_stats():
-    total_downloads = await db.download_cache.count_documents({})
-    platforms_stats = await db.download_cache.aggregate(
-        [{"$group": {"_id": "$platform", "count": {"$sum": 1}}}]
-    ).to_list(10)
+    if db is None:
+        return {"total_downloads": 0, "by_platform": {}}
+    try:
+        total_downloads = await db.download_cache.count_documents({})
+        platforms_stats = await db.download_cache.aggregate(
+            [{"$group": {"_id": "$platform", "count": {"$sum": 1}}}]
+        ).to_list(10)
+    except Exception:
+        return {"total_downloads": 0, "by_platform": {}}
     return {
         "total_downloads": total_downloads,
         "by_platform": {item["_id"]: item["count"] for item in platforms_stats},
