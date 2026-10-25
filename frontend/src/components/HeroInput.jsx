@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Loader2, Clipboard, Download, Link2, X } from "lucide-react";
 import { toast } from "sonner";
 import { detectPlatform, PlatformChips } from "@/components/PlatformIcons";
@@ -7,17 +7,34 @@ const DEFAULT_HINT = "Works with public links. Paste one to get started.";
 
 export const HeroInput = ({ onSubmit, loading, placeholder, showPlatforms = false }) => {
   const [url, setUrl] = useState("");
+  const inputRef = useRef(null);
   const platform = detectPlatform(url);
 
+  // Many mobile browsers (in-app browsers, some iOS/Android ones) block
+  // clipboard reads. Instead of failing, focus the field so the user can
+  // long-press and paste with the native menu.
+  const fallbackToManualPaste = useCallback(() => {
+    inputRef.current?.focus();
+    toast.info("Long-press the field and tap Paste to insert your link.");
+  }, []);
+
   const handlePaste = useCallback(async () => {
+    if (!navigator.clipboard?.readText) {
+      fallbackToManualPaste();
+      return;
+    }
     try {
-      const text = await navigator.clipboard.readText();
+      const text = (await navigator.clipboard.readText()).trim();
+      if (!text) {
+        fallbackToManualPaste();
+        return;
+      }
       setUrl(text);
       toast.success("URL pasted from clipboard");
     } catch (err) {
-      toast.error("Unable to access clipboard");
+      fallbackToManualPaste();
     }
-  }, []);
+  }, [fallbackToManualPaste]);
 
   const handleClear = useCallback(() => {
     setUrl("");
@@ -48,6 +65,7 @@ export const HeroInput = ({ onSubmit, loading, placeholder, showPlatforms = fals
             <Link2 className="w-5 h-5 shrink-0 text-muted-foreground" aria-hidden="true" />
             <input
               id="video-url"
+              ref={inputRef}
               type="url"
               inputMode="url"
               autoComplete="off"
